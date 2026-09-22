@@ -76,6 +76,7 @@ namespace Craft
 
                 if (win32Window && win32Window->messageHandler)
                 {
+                    // HWND의 GWLP_USERDATA 슬롯에 인스턴스 정보를 저장시킨다.
                     SetWindowLongPtr(window, GWLP_USERDATA, (LONG_PTR)win32Window);
                 }
             }
@@ -84,6 +85,7 @@ namespace Craft
         }
 
         // 생성 이후의 이벤트 처리
+        // HWND의 GWLP_USERDATA 슬롯에 있는 인스턴스 정보를 통해 interface 함수를 호출시킨다.
         Win32Window* win32Window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(window, GWLP_USERDATA));
         if (win32Window && win32Window->messageHandler)
         {
