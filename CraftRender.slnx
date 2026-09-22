@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="CraftEngine/CraftEngine.vcxproj" Id="c537947c-8cfb-4f91-a277-d6fb3568dc88" />
+</Solution>
