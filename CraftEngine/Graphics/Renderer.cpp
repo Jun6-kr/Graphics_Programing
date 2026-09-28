@@ -179,6 +179,7 @@ namespace Craft
 			factory = nullptr;
 		}
 	}
+
 	void Renderer::CreateRenderTargetView()
 	{
 		// 백버퍼 (2차원 배열-텍스처) 정보 가져오기
@@ -190,6 +191,7 @@ namespace Craft
 		// 사용한 후 해제
 		SafeRelease(backBuffer);
 	}
+
 	void Renderer::CreateDemoBuffers()
 	{
 		// Temp 구조체 선언
@@ -243,6 +245,7 @@ namespace Craft
 
 		ThrowIfFailed(device->CreateBuffer(&indexBufferDesc, &indexBufferData, &indexBuffer), L"Failed to create index buffer");
 	}
+
 	void Renderer::CreateDefaultShaders()
 	{
 		// 셰이더 컴파일 결과 저장용 객체
@@ -321,6 +324,7 @@ namespace Craft
 		SafeRelease(vertexShaderObject);
 		SafeRelease(pixelShaderObject);
 	}
+
 	void Renderer::CreateViewport(uint32_t width, uint32_t height)
 	{
 		// 뷰포트 설정

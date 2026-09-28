@@ -32,7 +32,8 @@ namespace Craft
 		// 장치 생성
 		void CreateDevices();
 
-		// 스왑체인 생성
+		// 스왑체인 생성 - GPU가 그린 화면을 실제 Windows 창에 보여주기 위해 화면 버퍼를 관리하는 객체
+		// -> Direct3D와 창(window)를 연계해주는 역할
 		void CreateSwapChain(const Win32Window& window);
 
 		// 렌더 타켓 뷰 생성
@@ -51,9 +52,11 @@ namespace Craft
 		// 장치(그래픽카드)
 
 		// 디바이스 -> 데이터 생성
+		// GPU에서 사용할, 리소스  제작 담당
 		ID3D11Device* device = nullptr;
 
 		// 그래픽카드에 데이터 설정(연결/바인딩)
+		// device에 의해 만들어진 리소스를 설정하고 명령하는 개체
 		ID3D11DeviceContext* context = nullptr;
 
 		// 기능 변경이 거의 없는 장치
