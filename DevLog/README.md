@@ -28,15 +28,16 @@ DevLog는 Git commit과 diff를 근거로 작성하며, 코드에서 확인되�
 ```text
 Study/
 ├─ 2026-09-22.md              # 기존 Review 기록
-├─ 2026-09-23.md              # 기존 Review 기록
-└─ DevLog/
-   ├─ README.md
-   ├─ TEMPLATE.md
-   └─ daily/
-      └─ YYYY-MM-DD.md
+└─ 2026-09-23.md              # 기존 Review 기록
+
+DevLog/
+├─ README.md                   # DevLog 운영 기준
+├─ TEMPLATE.md                 # 일일 기록 템플릿
+└─ daily/
+   └─ YYYY-MM-DD.md            # 날짜별 구현 기록
 ```
 
-기존 Review 문서는 현재 위치를 유지합니다. 이후 필요하면 별도 `Review/` 디렉터리로 정리할 수 있습니다.
+기존 Review 문서는 `Study/` 위치를 유지하고, DevLog는 저장소 루트의 `DevLog/` 디렉터리에서 별도로 관리합니다.
 
 ## DevLog 작성 기준
 
@@ -100,7 +101,7 @@ Study/
 
 1. 실제 구현 commit의 작성 날짜를 기준으로 `daily/YYYY-MM-DD.md`를 사용합니다.
 2. 같은 날짜의 구현 commit은 하나의 문서에 누적합니다.
-3. 문서만 추가하는 Study/DevLog commit은 구현 내역으로 다시 기록하지 않습니다.
+3. 문서만 추가하는 DevLog commit은 구현 내역으로 다시 기록하지 않습니다.
 4. 가능한 경우 commit SHA와 관련 파일을 함께 기록합니다.
 5. 기존 기록은 보존하고 같은 내용은 중복 작성하지 않습니다.
 6. 코드에서 확인되지 않은 의도나 학습 내용을 사실처럼 적지 않습니다.
