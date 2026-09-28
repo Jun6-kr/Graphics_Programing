@@ -1,39 +1,111 @@
-# Graphics Programming Development Log
+# CraftEngine Graphics Programming Log
 
-Graphics_Programing 프로젝트에서 **새로 구현하거나 추가한 내용**을 Git commit 기준으로 날짜별 기록합니다.
+이 디렉터리는 `Graphics_Programing` 저장소에서 진행하는 **Direct3D 11 / Win32 기반 그래픽스 프로그래밍 구현 기록**을 관리합니다.
 
-기존 개념 복습 문서와 분리하여 운영합니다.
+이 프로젝트의 기록은 두 트랙으로 나눕니다.
+
+- **Review**: 이전에 구현한 내용을 다시 설명하고 개념을 정리한 복습 기록
+- **DevLog**: 그날 새로 배우면서 실제 코드에 추가한 구현 내용
+
+DevLog는 Git commit과 diff를 근거로 작성하며, 코드에서 확인되지 않는 의도는 임의로 보완하지 않습니다.
+
+## Project scope
+
+현재 프로젝트는 `CraftEngine`이라는 작은 그래픽스/게임 엔진 구조를 직접 구현하면서 다음 영역을 학습하는 것을 목표로 합니다.
+
+- Win32 Window 생성 및 Message 처리
+- Engine Loop / Frame 제어
+- Direct3D 11 Device / DeviceContext
+- DXGI Swap Chain / Back Buffer
+- Render Target / Depth-Stencil
+- Vertex / Index Buffer
+- Shader / Input Layout
+- Viewport / Rasterizer / Output Merger
+- 이후 Texture, Transform, Camera 등 렌더링 파이프라인 확장
 
 ## Structure
 
 ```text
 Study/
-├─ 2026-09-22.md
-├─ 2026-09-23.md
+├─ 2026-09-22.md              # 기존 Review 기록
+├─ 2026-09-23.md              # 기존 Review 기록
 └─ DevLog/
    ├─ README.md
+   ├─ TEMPLATE.md
    └─ daily/
       └─ YYYY-MM-DD.md
 ```
 
-## Categories
+기존 Review 문서는 현재 위치를 유지합니다. 이후 필요하면 별도 `Review/` 디렉터리로 정리할 수 있습니다.
 
-- **Work**: 해당 날짜의 commit에서 확인된 구현/변경 작업
-- **Solved**: commit 또는 diff에서 문제와 해결 과정이 직접 확인되는 경우
-- **Decision**: 코드에서 확인되는 주요 기술 선택. 이유가 확인되지 않으면 이유를 임의로 작성하지 않음
-- **Issue**: diff에서 직접 확인되는 미완료 사항 또는 명시적 문제
-- **Next**: commit에 다음 작업이 명시된 경우 기록
-- **Review Checklist**: 코드상 다시 확인할 필요가 있는 항목
+## DevLog 작성 기준
+
+### Implementation
+
+해당 날짜의 commit에서 실제로 추가하거나 변경한 코드입니다.
+
+예:
+
+- `CreateSwapChain()` 구현
+- Vertex Buffer 생성
+- HLSL Shader 추가
+- Viewport 바인딩
+
+### Learned
+
+그 구현을 통해 새로 다룬 기술 개념입니다.
+
+단, commit/diff만으로 학습 의도를 확인할 수 없는 경우에는 코드에서 직접 확인되는 범위까지만 기록합니다.
+
+예:
+
+- Swap Chain과 HWND 연결
+- RTV를 통한 Render Target 지정
+- Vertex/Index Buffer의 역할
+
+### Problem / Solved
+
+코드 변경이나 commit 메시지에서 실제 문제와 해결 과정이 확인되는 경우 기록합니다.
+
+문제가 명확하지 않으면 임의로 만들어내지 않습니다.
+
+### Decision
+
+구현에서 확인되는 주요 기술 선택을 기록합니다.
+
+예:
+
+- `D3D_DRIVER_TYPE_HARDWARE`
+- Double Buffering
+- `DXGI_SWAP_EFFECT_FLIP_DISCARD`
+- Shader Model 5.0
+
+선택한 **이유**가 commit이나 대화에 남아 있지 않으면 이유를 추측해서 작성하지 않습니다.
+
+### Issue
+
+미완성 코드, TODO, 잘못된 설정 가능성, 후속 확인이 필요한 항목을 기록합니다.
+
+확정된 버그와 단순 검토 필요 항목은 구분해서 작성합니다.
+
+### Next
+
+다음 구현 단계가 commit, 코드, 또는 해당 날짜의 학습 흐름에서 명확하게 확인되는 경우 기록합니다.
+
+### Review Checklist
+
+나중에 직접 다시 확인할 가치가 있는 코드나 개념을 체크리스트로 남깁니다.
 
 ## Update workflow
 
-1. Git commit의 작성 일자를 기준으로 `daily/YYYY-MM-DD.md`에 기록합니다.
-2. 같은 날짜의 commit은 하나의 Daily 문서에 합칩니다.
-3. 기존 기록은 보존하며 같은 의미의 항목은 중복 작성하지 않습니다.
-4. 가능한 경우 관련 commit SHA와 변경 파일을 함께 기록합니다.
-5. commit/diff에서 확인되지 않은 의도나 이유는 임의로 추측하지 않습니다.
-6. 단순 Study/문서 commit은 구현 DevLog에서 제외할 수 있습니다.
+1. 실제 구현 commit의 작성 날짜를 기준으로 `daily/YYYY-MM-DD.md`를 사용합니다.
+2. 같은 날짜의 구현 commit은 하나의 문서에 누적합니다.
+3. 문서만 추가하는 Study/DevLog commit은 구현 내역으로 다시 기록하지 않습니다.
+4. 가능한 경우 commit SHA와 관련 파일을 함께 기록합니다.
+5. 기존 기록은 보존하고 같은 내용은 중복 작성하지 않습니다.
+6. 코드에서 확인되지 않은 의도나 학습 내용을 사실처럼 적지 않습니다.
+7. Review에서 정리한 개념과 DevLog의 구현 기록은 서로 섞지 않습니다.
 
 ## Daily logs
 
-- [2026-09-22](daily/2026-09-22.md) — 프로젝트 초기 구성, Win32 Window/Engine 루프, Direct3D11 Renderer 기본 파이프라인, 기본 Shader 및 Math 코드
+- [2026-09-22](daily/2026-09-22.md) — CraftEngine 초기 구성, Win32 Window/Engine Loop, Direct3D11 기본 렌더링 파이프라인, Shader 및 Math 코드
