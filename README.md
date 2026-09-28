@@ -111,3 +111,4 @@ DevLog/
 ## Daily logs
 
 - [2026-09-22](DevLog/daily/2026-09-22.md) — CraftEngine 초기 구성, Win32 Window/Engine Loop, Direct3D11 기본 렌더링 파이프라인, Shader 및 Math 코드
+- [2026-09-28](DevLog/daily/2026-09-28.md) — Vector2 사칙연산 확장, Vector3·Matrix4 클래스 추가
