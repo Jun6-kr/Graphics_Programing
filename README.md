@@ -1,6 +1,6 @@
 # CraftEngine Graphics Programming Log
 
-이 디렉터리는 `Graphics_Programing` 저장소에서 진행하는 **Direct3D 11 / Win32 기반 그래픽스 프로그래밍 구현 기록**을 관리합니다.
+이 `Graphics_Programing` 저장소는 **Direct3D 11 / Win32 기반 그래픽스 프로그래밍 구현 기록**을 관리합니다.
 
 이 프로젝트의 기록은 두 트랙으로 나눕니다.
 
@@ -26,12 +26,13 @@ DevLog는 Git commit과 diff를 근거로 작성하며, 코드에서 확인되�
 ## Structure
 
 ```text
+README.md                       # 프로젝트 및 DevLog 운영 기준
+
 Study/
 ├─ 2026-09-22.md              # 기존 Review 기록
 └─ 2026-09-23.md              # 기존 Review 기록
 
 DevLog/
-├─ README.md                   # DevLog 운영 기준
 ├─ TEMPLATE.md                 # 일일 기록 템플릿
 └─ daily/
    └─ YYYY-MM-DD.md            # 날짜별 구현 기록
@@ -99,7 +100,7 @@ DevLog/
 
 ## Update workflow
 
-1. 실제 구현 commit의 작성 날짜를 기준으로 `daily/YYYY-MM-DD.md`를 사용합니다.
+1. 실제 구현 commit의 작성 날짜를 기준으로 `DevLog/daily/YYYY-MM-DD.md`를 사용합니다.
 2. 같은 날짜의 구현 commit은 하나의 문서에 누적합니다.
 3. 문서만 추가하는 DevLog commit은 구현 내역으로 다시 기록하지 않습니다.
 4. 가능한 경우 commit SHA와 관련 파일을 함께 기록합니다.
@@ -109,4 +110,4 @@ DevLog/
 
 ## Daily logs
 
-- [2026-09-22](daily/2026-09-22.md) — CraftEngine 초기 구성, Win32 Window/Engine Loop, Direct3D11 기본 렌더링 파이프라인, Shader 및 Math 코드
+- [2026-09-22](DevLog/daily/2026-09-22.md) — CraftEngine 초기 구성, Win32 Window/Engine Loop, Direct3D11 기본 렌더링 파이프라인, Shader 및 Math 코드
