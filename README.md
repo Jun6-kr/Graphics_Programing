@@ -30,8 +30,7 @@ README.md                       # 프로젝트 및 DevLog 운영 기준
 
 Study/
 ├─ 2026-09-22.md              # 기존 Review 기록
-├─ 2026-09-23.md              # 기존 Review 기록
-└─ 2026-09-28.md              # Vector·Matrix 게임 수학 Review
+└─ 2026-09-23.md              # 기존 Review 기록
 
 DevLog/
 ├─ TEMPLATE.md                 # 일일 기록 템플릿
@@ -40,12 +39,6 @@ DevLog/
 ```
 
 기존 Review 문서는 `Study/` 위치를 유지하고, DevLog는 저장소 루트의 `DevLog/` 디렉터리에서 별도로 관리합니다.
-
-## Review logs
-
-- [2026-09-22](Study/2026-09-22.md) — Win32 Window, Engine 구조, Message 연결
-- [2026-09-23](Study/2026-09-23.md) — Message Loop, Direct3D11 Device·Swap Chain·Render Target
-- [2026-09-28](Study/2026-09-28.md) — 게임 수학: Vector2·Vector3·Matrix4
 
 ## DevLog 작성 기준
 
