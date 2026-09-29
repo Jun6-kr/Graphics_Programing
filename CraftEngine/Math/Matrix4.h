@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Math/Vector3.h>
+
 namespace Craft
 {
 	// 변환(Transform) 함수를 제공하는 4x4 행렬
@@ -10,8 +12,6 @@ namespace Craft
 		// 복사 생성자
 		Matrix4(const Matrix4& other);
 		~Matrix4() = default;
-
-		Matrix4& operator=(const Matrix4 other);
 
 		// 전치 함수 - 행과 열을 바꾸는 동작 처리
 		static Matrix4 Transpose(const Matrix4& matrix);
@@ -24,6 +24,16 @@ namespace Craft
 
 		// 내부에서 관리하는 배열의 원시 포인터 반환 함수
 		const float* Data() const { return elements; }
+
+		// 행렬 곱 연산자 오버로딩
+		Matrix4& operator= (const Matrix4 other);
+		Matrix4 operator* (const Matrix4 other) const;
+		Matrix4& operator*= (const Matrix4 other);
+
+		// 백터와 행렬 곱
+		// 행벡터로 사용해서 처리 -> 벡터가 좌측에 있어야 가능 // 언리얼이 이래서 (OpenGL이나 다른 교재에서는 열벡터로 처리)
+		// 행렬 곱 계산 시 행 x 열 로 처리하기 때문
+		friend Vector3 operator* (const Vector3& vector, const Matrix4& matrix);
 
 	public:
 		// 단위 행렬 상수
