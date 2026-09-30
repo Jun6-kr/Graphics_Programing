@@ -45,6 +45,65 @@ namespace Craft
 		return Transpose(matrix);
 	}
 
+	Matrix4 Matrix4::Translation(float x, float y, float z)
+	{
+		Matrix4 m;
+
+		m.m00 = 1.0f;	m.m01 = 0.0f;	m.m02 = 0.0f;	m.m03 = 0.0f;
+		m.m10 = 0.0f;	m.m11 = 1.0f;	m.m12 = 0.0f;	m.m13 = 0.0f;
+		m.m20 = 0.0f;	m.m21 = 0.0f;	m.m22 = 1.0f;	m.m23 = 0.0f;
+		m.m30 = x;		m.m31 = y;		m.m32 = z;		m.m33 = 1.0f;
+
+		return m;
+	}
+
+	Matrix4 Matrix4::Translation(const Vector3& translation)
+	{
+		return Translation(translation.x, translation.y, translation.z);
+	}
+
+	Matrix4 Matrix4::Scale(float x, float y, float z)
+	{
+		Matrix4 m;
+
+		m.m00 = x;		m.m01 = 0.0f;	m.m02 = 0.0f;	m.m03 = 0.0f;
+		m.m10 = 0.0f;	m.m11 = y;		m.m12 = 0.0f;	m.m13 = 0.0f;
+		m.m20 = 0.0f;	m.m21 = 0.0f;	m.m22 = z;		m.m23 = 0.0f;
+		m.m30 = 0.0f;	m.m31 = 0.0f;	m.m32 = 0.0f;	m.m33 = 1.0f;
+
+		return m;
+	}
+
+	Matrix4 Matrix4::Scale(const Vector3& scale)
+	{
+		return Scale(scale.x, scale.y, scale.z);
+	}
+
+	Matrix4 Matrix4::Scale(float scale)
+	{
+		return Scale(scale, scale, scale);
+	}
+
+	Matrix4 Matrix4::Rotation(float angle)
+	{
+		return Matrix4();
+	}
+
+	Matrix4 Matrix4::RotationX(float angle)
+	{
+		return Matrix4();
+	}
+
+	Matrix4 Matrix4::RotationY(float angle)
+	{
+		return Matrix4();
+	}
+
+	Matrix4 Matrix4::RotationZ(float angle)
+	{
+		return Matrix4();
+	}
+
 	Matrix4& Matrix4::operator=(const Matrix4 other)
 	{
 		memcpy(elements, other.elements, sizeof(elements));

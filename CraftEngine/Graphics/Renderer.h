@@ -19,6 +19,9 @@ namespace Craft
 
 		void Draw(float red, float green, float blue, uint32_t vsync);
 
+		// 크기 변경 이벤트 함수
+		void OnResize(uint32_t width, uint32_t height);
+
 	private:
 		// 그리기 단계 별로 실행되는 함수
 

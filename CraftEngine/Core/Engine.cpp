@@ -109,6 +109,14 @@ namespace Craft
         }
     }
 
+    void Engine::OnResize(uint32_t width, uint32_t height)
+    {
+        if (renderer)
+        {
+            renderer->OnResize(width, height);
+        }
+    }
+
     LRESULT Engine::HandleMessage(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
     {
         // 메시지 처리
@@ -142,6 +150,17 @@ namespace Craft
         }
         return 0;
 
+        // 창 크기 메시지 처리
+        case WM_SIZE:
+        {
+            // 변겨왼 너비/높이 구하기
+            uint32_t width = LOWORD(lparam);
+            uint32_t height = HIWORD(lparam);
+
+            // 메시지 전파
+            OnResize(width, height);
+        }
+        return 0;
         // ESC 키 입력 처리
         case WM_KEYDOWN:
         {

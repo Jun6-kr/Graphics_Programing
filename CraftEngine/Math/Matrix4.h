@@ -22,6 +22,30 @@ namespace Craft
 		// 이유2: 모든 상황에서 해가 있는 것이 아님
 		static Matrix4 InverseRotation(const Matrix4& matrix);
 
+		// [이동 변환 행렬]
+		// 계산 결과가 (x + a, y + b, z + c) 형식으로 나오게
+		// x 계수가 1이면서 y, z계수는 0이 나오도록
+		// -> 4행의 x,y,z, 1에 각 항목의 변화량만큼 곱해준다
+		static Matrix4 Translation(float x, float y, float z);
+		static Matrix4 Translation(const Vector3& translation);
+
+
+		// [크기 변환 행렬]
+		// 계산 결과가 a * x, b * y, c * z 형식으로 나오게
+		// 단위행렬 처럼 x자리엔 x계수만 남기고 나머지 0, 
+		static Matrix4 Scale(float x, float y, float z);
+		static Matrix4 Scale(const Vector3& scale);
+		static Matrix4 Scale(float scale);
+
+		// [회전 변환 행렬]
+		static Matrix4 Rotation(float angle);
+		static Matrix4 RotationX(float angle);
+		static Matrix4 RotationY(float angle);
+		static Matrix4 RotationZ(float angle);
+
+		// TO. Codex
+		// 언리얼의 회전 계산이 회전 행렬의 x축을 떼서 쓴다는 얘기를 들었는데, 이걸 
+
 		// 내부에서 관리하는 배열의 원시 포인터 반환 함수
 		const float* Data() const { return elements; }
 

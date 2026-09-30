@@ -50,6 +50,27 @@ namespace Craft
 		EndScene(vsync);
 	}
 
+	void Renderer::OnResize(uint32_t width, uint32_t height)
+	{
+		// 원래 크기 확인
+		DXGI_SWAP_CHAIN_DESC desc = {};
+		swapChain->GetDesc(&desc);
+
+		// RenderTargetView 해제 - buffer와 RTV가 연결되어 있는 상태면 크기 변경이 안 된다
+		SafeRelease(renderTargetView);
+
+		// 백버퍼 크기 변경
+		ThrowIfFailed(swapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_UNKNOWN, 0), L"Failed to resize back buffer");
+
+		swapChain->GetDesc(&desc);
+
+		// RTV 재생성
+		CreateRenderTargetView();
+
+		// 뷰포트 크기 재설정
+		CreateViewport(width, height);
+	}
+
 	void Renderer::BeginScene(float red, float green, float blue)
 	{
 		// 그리기 준비
