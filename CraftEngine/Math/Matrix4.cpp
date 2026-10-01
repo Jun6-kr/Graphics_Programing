@@ -1,6 +1,8 @@
 ﻿#include "Matrix4.h"
+#include "MathDefines.h"
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 
 namespace Craft
 {
@@ -84,24 +86,81 @@ namespace Craft
 		return Scale(scale, scale, scale);
 	}
 
-	Matrix4 Matrix4::Rotation(float angle)
+	Matrix4 Matrix4::Rotation(float x, float y, float z)
 	{
-		return Matrix4();
+		// 무조건은 아니지만, 일반적으로 x -> y -> z축 순으로 회전을 적용
+		return RotationX(x) * RotationY(y) * RotationZ(z);
 	}
 
+	Matrix4 Matrix4::Rotation(const Vector3& rotation)
+	{
+		return Rotation(rotation.x, rotation.y, rotation.z);
+	}
+
+	// X축 회전
 	Matrix4 Matrix4::RotationX(float angle)
 	{
-		return Matrix4();
+		// [ C  S]
+		// [-S  C]
+
+		// 코사인/사인 값 구하기
+		float cosAngle = std::cos(angle * DegreesToRadians);
+		float sinAngle = std::sin(angle * DegreesToRadians);
+
+		Matrix4 m;
+
+		// X축은 회전에 영향을 받지 않는다
+		m.m00 = 1.0f;	m.m01 = 0.0f;		m.m02 = 0.0f;		m.m03 = 0.0f;
+		m.m10 = 0.0f;	m.m11 = cosAngle;	m.m12 = sinAngle;	m.m13 = 0.0f;
+		m.m20 = 0.0f;	m.m21 = -sinAngle;	m.m22 = cosAngle;	m.m23 = 0.0f;
+		m.m30 = 0.0f;	m.m31 = 0.0f;		m.m32 = 0.0f;		m.m33 = 1.0f;
+
+
+		return m;
 	}
 
 	Matrix4 Matrix4::RotationY(float angle)
 	{
-		return Matrix4();
+		// [ C  S]
+		// [-S  C]
+
+		// 코사인/사인 값 구하기
+		float cosAngle = std::cos(angle * DegreesToRadians);
+		float sinAngle = std::sin(angle * DegreesToRadians);
+
+		Matrix4 m;
+
+		// Y축은 회전에 영향을 받지 않는다 - Y축 회전은 sin에 -1을 곱해준다
+		// TO. Codex 이거 설명해줘.`
+		m.m00 = cosAngle;	m.m01 = 0.0f;	m.m02 = -sinAngle;	m.m03 = 0.0f;
+		m.m10 = 0.0f;		m.m11 = 1.0f;	m.m12 = 0.0f;		m.m13 = 0.0f;
+		m.m20 = sinAngle;	m.m21 = 0.0f;	m.m22 = cosAngle;	m.m23 = 0.0f;
+		m.m30 = 0.0f;		m.m31 = 0.0f;	m.m32 = 0.0f;		m.m33 = 1.0f;
+
+
+		return m;
 	}
 
+	// Z축 회전
 	Matrix4 Matrix4::RotationZ(float angle)
 	{
-		return Matrix4();
+		// [ C  S]
+		// [-S  C]
+
+		// 코사인/사인 값 구하기
+		float cosAngle = std::cos(angle * DegreesToRadians);
+		float sinAngle = std::sin(angle * DegreesToRadians);
+
+		Matrix4 m;
+
+		// Z축은 회전에 영향을 받지 않는다
+		m.m00 = cosAngle;	m.m01 = sinAngle;	m.m02 = 0.0f;	m.m03 = 0.0f;
+		m.m10 = -sinAngle;	m.m11 = cosAngle;	m.m12 = 0.0f;	m.m13 = 0.0f;
+		m.m20 = 0.0f;		m.m21 = 0.0f;		m.m22 = 1.0f;	m.m23 = 0.0f;
+		m.m30 = 0.0f;		m.m31 = 0.0f;		m.m32 = 0.0f;	m.m33 = 1.0f;
+
+
+		return m;
 	}
 
 	Matrix4& Matrix4::operator=(const Matrix4 other)

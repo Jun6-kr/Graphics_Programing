@@ -105,7 +105,7 @@ namespace Craft
         // 이벤트 전달
         if (renderer)
         {
-            renderer->Draw(0.6f, 0.7f, 0.8f, 0);
+            renderer->Draw(0.0f, 0.0f, 0.0f, 0);
         }
     }
 
@@ -114,6 +114,11 @@ namespace Craft
         if (renderer)
         {
             renderer->OnResize(width, height);
+        }
+
+        if (window)
+        {
+            window->OnResize(width, height);
         }
     }
 

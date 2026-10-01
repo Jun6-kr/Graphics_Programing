@@ -63,6 +63,12 @@ namespace Craft
         UnregisterClass(className.c_str(), instance);
 	}
 
+    void Win32Window::OnResize(uint32_t width, uint32_t height)
+    {
+        this->width = width;
+        this->height = height;
+    }
+
 	LRESULT CALLBACK Win32Window::Win32MessageHandler(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
 	{
         if (message == WM_CREATE)

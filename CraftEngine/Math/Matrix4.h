@@ -37,14 +37,18 @@ namespace Craft
 		static Matrix4 Scale(const Vector3& scale);
 		static Matrix4 Scale(float scale);
 
-		// [회전 변환 행렬]
-		static Matrix4 Rotation(float angle);
+		// [회전 변환 행렬] -> 점을 이동시킨다기 보단, 공간을 회전시키는 것
+		// 회전 변환은 벡터(위치)의 크기를 유지시킨다. 크기 = 원점에서 해당 위치까지의 거리
+		// 편의상 단위 원 안에서 유도. 단위 원 = 반지름이 1인 원
+		//
 		static Matrix4 RotationX(float angle);
 		static Matrix4 RotationY(float angle);
 		static Matrix4 RotationZ(float angle);
+		static Matrix4 Rotation(float x, float y, float z);
+		static Matrix4 Rotation(const Vector3& rotation);
 
 		// TO. Codex
-		// 언리얼의 회전 계산이 회전 행렬의 x축을 떼서 쓴다는 얘기를 들었는데, 이걸 
+		// 언리얼의 회전 계산이 회전 행렬의 x축을 떼서 쓴다는 얘기를 들었는데, 이걸 설명해줘
 
 		// 내부에서 관리하는 배열의 원시 포인터 반환 함수
 		const float* Data() const { return elements; }

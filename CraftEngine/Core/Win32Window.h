@@ -14,6 +14,9 @@ namespace Craft
 		Win32Window(uint32_t width = 1280, uint32_t height = 800, IMessageHandler* messageHandler = nullptr, const std::wstring title = L"Craft Render Engine");
 		~Win32Window();
 
+		// 창 크기 변경 이벤트
+		void OnResize(uint32_t width, uint32_t height);
+
 		// Getter
 		inline uint32_t GetWidth() const { return width; }
 		inline uint32_t GetHeight() const { return height; }
