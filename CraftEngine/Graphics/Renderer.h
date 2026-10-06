@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <Core/Core.h>
+#include <Math/Matrix4.h>
 // direct3d 라이브러리의 객체를 생성하기 위해 추가
 #include <d3d11.h>
 #include <dxgi.h>
@@ -13,6 +14,14 @@ namespace Craft
 	// CPU에서 GPU로 명령을 전달
 	class /*CRAFT_API*/ Renderer
 	{
+		// 그리기에 필요한 데이터
+		struct RenderCommand
+		{
+			// 월드 행렬
+			//Matrix4 worldMatrix::;
+
+		};
+
 	public:
 		Renderer(const Win32Window& window);
 		~Renderer();
@@ -51,6 +60,10 @@ namespace Craft
 
 		void CreateViewport(uint32_t width, uint32_t height);
 
+		// 트랜스폼 상수 버퍼 생성 및 갯ㅇ신 함수
+		void CreateTansformBuffer();
+		void UpdateTrnasformBUffer(const Matrix4& worldMatrix);
+
 	private:
 		// 장치(그래픽카드)
 
@@ -80,6 +93,9 @@ namespace Craft
 
 		// 입력의 정보를 전달하는데 사용되는 객체
 		ID3D11InputLayout* inputLayout = nullptr;
+
+		// 트랜스폼 데이터를 전달할 사우 버퍼
+		ID3D11Buffer* transformBuffer = nullptr;
 
 		// 뷰포트 - 화면을 어떻게 사용할지 정의하는 구조체
 		D3D11_VIEWPORT viewport = {};

@@ -24,6 +24,9 @@ namespace Craft
 
 		// 부표트 생성 및 바인딩
 		CreateViewport(window.GetWidth(), window.GetHeight());
+
+		// 트랜스폼 버퍼 생성
+		CreateTansformBuffer();
 	}
 	Renderer::~Renderer()
 	{
@@ -39,6 +42,9 @@ namespace Craft
 		SafeRelease(swapChain);
 		SafeRelease(context);
 		SafeRelease(device);
+
+
+		SafeRelease(transformBuffer);
 	}
 
 	void Renderer::Draw(float red, float green, float blue, uint32_t vsync)
@@ -359,5 +365,46 @@ namespace Craft
 
 		// 바인딩
 		context->RSSetViewports(1, &viewport);
+	}
+	void Renderer::CreateTansformBuffer()
+	{
+		// 버퍼 구성 정보
+		D3D11_BUFFER_DESC indexBufferDesc = {};
+		indexBufferDesc.ByteWidth = sizeof(Matrix4);				// 버퍼 크기
+		indexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;				// 사용 목적
+		indexBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		indexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+		// 버퍼에 저장할 데이터
+		D3D11_SUBRESOURCE_DATA indexBufferData = {};
+		indexBufferData.pSysMem = Matrix4::Identity.Data();
+
+		ThrowIfFailed(device->CreateBuffer(&indexBufferDesc, &indexBufferData, &transformBuffer), L"Failed to create transform buffer");
+
+	}
+	void Renderer::UpdateTrnasformBUffer(const Matrix4& worldMatrix)
+	{
+		// 버퍼에 저장할 데이터 설정 과정 처리
+		// context->UpdateSubresource() : 일반 버퍼의 데이터 변경 가능
+		// 간할적인(너무 자주 아닌) 데이터 갱신 시 사용 권장
+
+		// 버퍼와 연결할 리소스 생성
+		D3D11_MAPPED_SUBRESOURCE mapped = {};
+
+		// 버퍼와 연동
+
+		/*
+		* [도와줘요 CODEX]
+		 D3D11_MAP_WRITE_DISCARD - 리소스 폐기??
+		 mapped에 넣으면 GPU가 transformBuffer에 넣어줌?
+		*/
+
+		ThrowIfFailed(context->Map(transformBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped), L"Failed to map transform buffer");
+
+		// 업데이트 할 데이터 설정
+		std::memcpy(mapped.pData, worldMatrix.Data(), sizeof(Matrix4));
+
+		// 버퍼와 연동 해제
+		context->Unmap(transformBuffer, 0);
 	}
 }
