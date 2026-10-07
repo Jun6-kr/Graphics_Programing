@@ -49,6 +49,10 @@ namespace Craft
 
 		// TO. Codex
 		// 언리얼의 회전 계산이 회전 행렬의 x축을 떼서 쓴다는 얘기를 들었는데, 이걸 설명해줘
+		// [CODEX 답변]
+		// 언리얼은 로컬 X축을 Forward로 사용한다. 회전 행렬에는 회전된 로컬 X/Y/Z 기저축이 들어 있으므로
+		// X축 기저를 꺼내면 현재 회전이 적용된 Forward 방향을 얻을 수 있다.
+		// 이는 전체 회전을 X축 하나로 계산한다는 뜻이 아니며, X축만으로는 Forward 축 주위의 Roll을 복원할 수 없다.
 
 		// 내부에서 관리하는 배열의 원시 포인터 반환 함수
 		const float* Data() const { return elements; }

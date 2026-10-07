@@ -1,12 +1,16 @@
 ﻿#include "Renderer.h"
 #include <Core/Win32Window.h>
-#include <cstdint>
 #include <d3dcompiler.h>
+#include <cstdint>
+#include <cassert>
 
 namespace Craft
 {
 	Renderer::Renderer(const Win32Window& window)
 	{
+		assert(!instance);
+		instance = this;
+
 		// Device/Context 생성
 		CreateDevices();
 
@@ -30,6 +34,8 @@ namespace Craft
 	}
 	Renderer::~Renderer()
 	{
+		instance = nullptr;
+
 		// 실제 리소스
 		SafeRelease(vertexBuffer);
 		SafeRelease(indexBuffer);
@@ -56,6 +62,16 @@ namespace Craft
 		EndScene(vsync);
 	}
 
+	void Renderer::Submit(const Matrix4& worldMatrix)
+	{
+		// 삽입할 렌더 명령 생성
+		RenderCommand command;
+		command.worldMatrix = worldMatrix;
+
+		// 렌더 목록에 추가
+		renderCommandList.emplace_back(command);
+	}
+
 	void Renderer::OnResize(uint32_t width, uint32_t height)
 	{
 		// 원래 크기 확인
@@ -75,6 +91,13 @@ namespace Craft
 
 		// 뷰포트 크기 재설정
 		CreateViewport(width, height);
+	}
+
+	Renderer& Renderer::Get()
+	{
+		assert(instance && "instance should not be null here");
+
+		return *instance;
 	}
 
 	void Renderer::BeginScene(float red, float green, float blue)
@@ -101,7 +124,22 @@ namespace Craft
 		context->VSSetShader(vertexShader, nullptr, 0);
 		context->PSSetShader(pixelShader, nullptr, 0);
 
-		// 드로우 콜
+		// 정점 세이더에 상수 버퍼(트랜스폼 버퍼) 바인딩
+		context->VSSetConstantBuffers(0, 1, &transformBuffer);
+
+		// 렌더 명령 처리
+		for (const RenderCommand& command : renderCommandList)
+		{
+			DrawCommand(command);
+		}
+	}
+
+	void Renderer::DrawCommand(const RenderCommand& command)
+	{
+		// 트랜스폼 데이터 업데이트
+		UpdateTrnasformBuffer(command.worldMatrix);
+
+		// 드로우콜
 		context->DrawIndexed(3, 0, 0);
 	}
 
@@ -382,7 +420,7 @@ namespace Craft
 		ThrowIfFailed(device->CreateBuffer(&indexBufferDesc, &indexBufferData, &transformBuffer), L"Failed to create transform buffer");
 
 	}
-	void Renderer::UpdateTrnasformBUffer(const Matrix4& worldMatrix)
+	void Renderer::UpdateTrnasformBuffer(const Matrix4& worldMatrix)
 	{
 		// 버퍼에 저장할 데이터 설정 과정 처리
 		// context->UpdateSubresource() : 일반 버퍼의 데이터 변경 가능
@@ -397,6 +435,13 @@ namespace Craft
 		* [도와줘요 CODEX]
 		 D3D11_MAP_WRITE_DISCARD - 리소스 폐기??
 		 mapped에 넣으면 GPU가 transformBuffer에 넣어줌?
+
+		 [CODEX 답변]
+		 WRITE_DISCARD는 기존 버퍼 내용을 보존하지 않겠다고 알리는 방식이다.
+		 GPU가 이전 내용을 사용하는 중이어도 드라이버가 새 쓰기 영역을 줄 수 있어 CPU 대기를 줄인다.
+		 mapped.pData는 Map이 돌려준 CPU 쓰기용 주소이며, 여기에 새 행렬을 복사한 뒤 Unmap하면
+		 이후 Draw 명령에서 GPU가 바인딩된 transformBuffer의 새 내용을 읽는다.
+		 따라서 GPU가 mapped에 값을 넣는 것이 아니라 CPU가 버퍼에 전달할 값을 작성하는 과정이다.
 		*/
 
 		ThrowIfFailed(context->Map(transformBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped), L"Failed to map transform buffer");

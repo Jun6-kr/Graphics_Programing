@@ -66,15 +66,17 @@ namespace Craft
                 float deltaTime = GetDeltaTime(current, previous);
                 float remainingTime = oneFrameTime - deltaTime;
 
-                // 스레드 재우기
-                while (remainingTime >= 0.002f)
-                {
-                    // Sleep에서 0 넣을 때와 1 넣을 때 차이점
-                    Sleep(1);
-
-                    deltaTime = GetDeltaTime(current, previous);
-                    remainingTime  = oneFrameTime - deltaTime;
-                }
+                //// 스레드 재우기
+                //while (remainingTime >= 0.002f)
+                //{
+                //    // Sleep에서 0 넣을 때와 1 넣을 때 차이점
+                //    Sleep(1);
+                //
+                //    // 프레임 시간 구하기
+                //    deltaTime = GetDeltaTime(current, previous);
+                //    // 남은 시간 구하기
+                //    remainingTime  = oneFrameTime - deltaTime;
+                //}
 
                 while (remainingTime > 0.0f)
                 {
@@ -105,7 +107,7 @@ namespace Craft
         // 이벤트 전달
         if (renderer)
         {
-            renderer->Draw(0.0f, 0.0f, 0.0f, 0);
+            renderer->Draw(100.0f, 200.0f, 0.0f, 0);
         }
     }
 

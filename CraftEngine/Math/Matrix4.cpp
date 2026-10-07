@@ -132,6 +132,10 @@ namespace Craft
 
 		// Y축은 회전에 영향을 받지 않는다 - Y축 회전은 sin에 -1을 곱해준다
 		// TO. Codex 이거 설명해줘.`
+		// [CODEX 답변]
+		// Y축 자체가 아니라 XZ 평면을 회전시키므로 두 sin 항의 부호가 서로 반대가 된다.
+		// 현재 행벡터 규약에서는 x' = x*cos + z*sin, z' = -x*sin + z*cos가 되므로
+		// m02에는 -sin, m20에는 +sin이 배치된다. 이렇게 해야 회전 후에도 축이 직교하고 길이가 유지된다.
 		m.m00 = cosAngle;	m.m01 = 0.0f;	m.m02 = -sinAngle;	m.m03 = 0.0f;
 		m.m10 = 0.0f;		m.m11 = 1.0f;	m.m12 = 0.0f;		m.m13 = 0.0f;
 		m.m20 = sinAngle;	m.m21 = 0.0f;	m.m22 = cosAngle;	m.m23 = 0.0f;
