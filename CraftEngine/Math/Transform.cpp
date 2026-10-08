@@ -18,6 +18,10 @@ namespace Craft
 	Vector3 Transform::Right() const
 	{
 		// 월드의 우측을 액터의 우측으로 회전시킨다? - 회전 행렬의 하나의 행을 사용한다?
+		// [CODEX 답변]
+		// 단위 Right 벡터를 현재 회전 행렬로 변환하면 Actor의 회전된 Local Right 방향을 얻는다.
+		// 현재 행벡터 규약에서는 (1, 0, 0) * Rotation 결과가 회전 행렬의 첫 번째 행과 같으므로
+		// 회전 행렬의 X축 기저를 꺼내 쓰는 것과 같은 의미다. 방향만 필요하므로 Translation은 적용하지 않는다.
 		return Vector3::Right * Matrix4::Rotation(rotation);
 	}
 

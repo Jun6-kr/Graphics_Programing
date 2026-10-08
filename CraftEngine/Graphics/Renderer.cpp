@@ -208,6 +208,10 @@ namespace Craft
 
 		/*
 		 DXGI_MODE_DESC BufferDesc;		// factory가 관리할 버퍼의 설정?
+		 // [CODEX 답변]
+		 // Factory가 직접 관리하는 설정이라기보다 Swap Chain Back Buffer의 표시 Mode를 설명한다.
+		 // 너비, 높이, Refresh Rate, Pixel Format, Scanline 순서와 Scaling 정보를 담으며
+		 // CreateSwapChain이 이 정보를 사용해 Buffer를 구성한다.
 		 DXGI_SAMPLE_DESC SampleDesc;
 		 DXGI_USAGE BufferUsage;
 		 UINT BufferCount;
@@ -322,6 +326,8 @@ namespace Craft
 			nullptr,								// 
 			nullptr,
 			"main",									// 엔트리 포인트 - shader 파일의 시작점 함수 이름?
+			// [CODEX 답변] 맞다. Compiler가 이 이름의 HLSL 함수부터 해당 Shader Stage를 Compile한다.
+			// 이름은 main일 필요가 없으며, 파일 안에 존재하는 함수 이름과 일치하면 된다.
 			"vs_5_0",								// 셰이더 모델 버전
 			0,
 			0,
@@ -370,6 +376,8 @@ namespace Craft
 			nullptr,								// 
 			nullptr,
 			"main",									// 엔트리 포인트 - shader 파일의 시작점 함수 이름?
+			// [CODEX 답변] Pixel Shader에서도 Compile을 시작할 HLSL 함수 이름이다.
+			// 바로 다음 Target인 ps_5_0이 이 함수를 Pixel Shader로 Compile하도록 Stage를 결정한다.
 			"ps_5_0",								// 셰이더 모델 버전
 			0,
 			0,

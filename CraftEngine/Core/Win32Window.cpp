@@ -12,7 +12,9 @@ namespace Craft
         wc.lpfnWndProc = Win32MessageHandler;
         wc.hInstance = instance;
         wc.lpszClassName = className.c_str();
-        wc.style = CS_HREDRAW | CS_VREDRAW;     // 다시 그리기 모드?
+		wc.style = CS_HREDRAW | CS_VREDRAW;     // 다시 그리기 모드?
+		// [CODEX 답변] Window 너비 또는 높이가 변하면 Client 영역 전체를 무효화해 다시 그리도록 하는 Class Style이다.
+		// 그 결과 WM_PAINT가 발생할 수 있으며, 지속적으로 그리는 Render Loop 자체를 설정하는 Option은 아니다.
 
         // 클래스 등록
         if (!RegisterClass(&wc))
