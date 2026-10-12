@@ -132,6 +132,9 @@ namespace Craft
 		{
 			DrawCommand(command);
 		}
+
+		// 랜더 명령 목록 정리
+		renderCommandList.clear();
 	}
 
 	void Renderer::DrawCommand(const RenderCommand& command)
@@ -231,7 +234,8 @@ namespace Craft
 		swapChainDesc.BufferCount = 2;
 		swapChainDesc.OutputWindow = window.GetHandle();
 		swapChainDesc.Windowed = true;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		//swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 		result = factory->CreateSwapChain(device, &swapChainDesc, &swapChain);
 

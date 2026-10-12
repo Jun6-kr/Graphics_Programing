@@ -29,11 +29,10 @@ namespace Craft
 
 		// 레벨 추가 함수
 		template<typename T, typename = std::enable_if<std::is_base_of<Level, T>::value>>
-		std::shared_ptr<T> AddNewLevel()
+		void AddNewLevel()
 		{
 			// 새 레벨 생성 후 nextLevel로 지정
-			std::shared_ptr<T> newLevel = std::shared_ptr<T>();
-			nextLevel = newLevel;
+			nextLevel = std::make_shared<T>();
 		}
 
 	protected:
