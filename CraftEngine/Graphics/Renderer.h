@@ -6,11 +6,13 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #include <cstdint>
+#include <memory>
 
 namespace Craft
 {
 	// 전방 선언
 	class Win32Window;
+	class StaticMesh;
 
 	// CPU에서 GPU로 명령을 전달
 	class /*CRAFT_API*/ Renderer
@@ -21,6 +23,8 @@ namespace Craft
 			// 월드 행렬
 			Matrix4 worldMatrix = Matrix4::Identity;
 
+			// 스태틱 메시
+			std::shared_ptr<StaticMesh> mesh;
 		};
 
 	public:
@@ -30,13 +34,19 @@ namespace Craft
 		void Draw(float red, float green, float blue, uint32_t vsync);
 
 		// 그리기에 필요한 데이터 제출 함수
-		void Submit(const Matrix4& worldMatrix);
+		void Submit(const std::shared_ptr<StaticMesh>& staticMesh, const Matrix4& worldMatrix);
 
 		// 크기 변경 이벤트 함수
 		void OnResize(uint32_t width, uint32_t height);
 
+
+		// [codex] 버퍼 생성 요청을 보내 Renderer가 버퍼를 생성해서 포인터를 반환하는 것이 올바른 설계
 		// 전역 접근 함수
 		static Renderer& Get();
+
+		// Getter
+		ID3D11Device& GetDevice() const { return *device; }
+		ID3D11DeviceContext& GetContext() const { return *context; }
 
 	private:
 		// 그리기 단계 별로 실행되는 함수
@@ -61,10 +71,6 @@ namespace Craft
 
 		// 렌더 타켓 뷰 생성
 		void CreateRenderTargetView();
-
-		// 데모를 위한 버퍼 생성 함수
-		// 버퍼 = 데이터 전송에 사용되는 메모리 덩어리
-		void CreateDemoBuffers();
 
 		// 기본 셰이더 생성 함수
 		void CreateDefaultShaders();
@@ -94,12 +100,6 @@ namespace Craft
 
 		// 백버퍼를 대표하는 렌더 타겟 - 그래픽 카드에 그릴 대상을 선정할 떄 사용하는 타입
 		ID3D11RenderTargetView* renderTargetView = nullptr;
-
-		// 정점 버퍼(VertextBuffer)
-		ID3D11Buffer* vertexBuffer = nullptr;
-
-		// 인덱스(색인) 버퍼
-		ID3D11Buffer* indexBuffer = nullptr;
 
 		// 셰이더 관련 변수
 		ID3D11VertexShader* vertexShader = nullptr;
