@@ -118,3 +118,4 @@ DevLog/
 - [2026-10-07](DevLog/daily/2026-10-07.md) — Engine·Game 프로젝트 분리, Render Command 처리, Transform Constant Buffer 바인딩
 - [2026-10-08](DevLog/daily/2026-10-08.md) — Component·Actor·Level 구조, 지연 추가·삭제, Gameplay 수명주기와 Render 제출 연결
 - [2026-10-12](DevLog/daily/2026-10-12.md) — Test Level·회전 Actor 구성, Level 생성 경로 수정, Frame별 Render Command 정리
+- [2026-10-13](DevLog/daily/2026-10-13.md) — StaticMesh 리소스 분리, Mesh 기반 Render Command, Mesh·Material·Draw Call·FBX 메모 정리
