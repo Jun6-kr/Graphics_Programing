@@ -1,5 +1,6 @@
 ﻿#include "Renderer.h"
 #include "StaticMesh.h"
+#include "Shader.h"
 #include <Core/Win32Window.h>
 #include <d3dcompiler.h>
 #include <cstdint>
@@ -21,9 +22,6 @@ namespace Craft
 		// 렌더 타겟 뷰 생성
 		CreateRenderTargetView();
 
-		// 셰이더 컴파일 및 셰이더 객체 생성
-		CreateDefaultShaders();
-
 		// 부표트 생성 및 바인딩
 		CreateViewport(window.GetWidth(), window.GetHeight());
 
@@ -33,11 +31,6 @@ namespace Craft
 	Renderer::~Renderer()
 	{
 		instance = nullptr;
-
-		// 실제 리소스
-		SafeRelease(vertexShader);
-		SafeRelease(pixelShader);
-		SafeRelease(inputLayout);
 
 		// 스왑체인이 관리하는 장치 관련 변수
 		SafeRelease(renderTargetView);
@@ -58,12 +51,13 @@ namespace Craft
 		EndScene(vsync);
 	}
 
-	void Renderer::Submit(const std::shared_ptr<StaticMesh>& mesh, const Matrix4& worldMatrix)
+	void Renderer::Submit(const std::shared_ptr<StaticMesh>& mesh, const std::shared_ptr<Shader>& shader, const Matrix4& worldMatrix)
 	{
 		// 삽입할 렌더 명령 생성
 		RenderCommand command;
 		command.worldMatrix = worldMatrix;
 		command.mesh = mesh;
+		command.shader = shader;
 
 		// 렌더 목록에 추가
 		renderCommandList.emplace_back(command);
@@ -108,11 +102,6 @@ namespace Craft
 
 	void Renderer::DrawScene()
 	{
-		// 셰이더 설정
-		context->IASetInputLayout(inputLayout);
-		context->VSSetShader(vertexShader, nullptr, 0);
-		context->PSSetShader(pixelShader, nullptr, 0);
-
 		// 정점 세이더에 상수 버퍼(트랜스폼 버퍼) 바인딩
 		context->VSSetConstantBuffers(0, 1, &transformBuffer);
 
@@ -128,14 +117,17 @@ namespace Craft
 
 	void Renderer::DrawCommand(const RenderCommand& command)
 	{
-		// 메시 설정이 안됐으면 종료
-		if (!command.mesh)
+		// 메시 / 셰이더 설정이 안됐으면 종료
+		if (nullptr == command.mesh || nullptr == command.shader)
 		{
 			return;
 		}
 
 		// 메시 바인딩
 		command.mesh->Bind();
+
+		// 셰이더 바인딩
+		command.shader->Bind();
 
 		// 트랜스폼 데이터 업데이트
 		UpdateTrnasformBuffer(command.worldMatrix);
@@ -261,89 +253,6 @@ namespace Craft
 
 		// 사용한 후 해제
 		SafeRelease(backBuffer);
-	}
-
-	void Renderer::CreateDefaultShaders()
-	{
-		// 셰이더 컴파일 결과 저장용 객체
-		ID3DBlob* vertexShaderObject = nullptr;
-
-		// Shader 컴파일
-		ThrowIfFailed(D3DCompileFromFile(
-			L"HLSLShaders/DefaultVS.hlsl",			// 파일명
-			nullptr,								// 
-			nullptr,
-			"main",									// 엔트리 포인트 - shader 파일의 시작점 함수 이름?
-			// [CODEX 답변] 맞다. Compiler가 이 이름의 HLSL 함수부터 해당 Shader Stage를 Compile한다.
-			// 이름은 main일 필요가 없으며, 파일 안에 존재하는 함수 이름과 일치하면 된다.
-			"vs_5_0",								// 셰이더 모델 버전
-			0,
-			0,
-			&vertexShaderObject,
-			nullptr
-		), L"Failed to compile vertex shader");
-
-		// 정점 셰이더 객체 생성
-		ThrowIfFailed(
-			device->CreateVertexShader(
-				vertexShaderObject->GetBufferPointer(),
-				vertexShaderObject->GetBufferSize(),
-				nullptr,
-				&vertexShader)
-			, L"Failed to create vertex shader");
-
-
-		/*
-		LPCSTR SemanticName
-		UINT SemanticIndex
-		DXGI_FORMAT Format
-		UINT InputSlot								// 정점 
-		UINT AlignedByteOffset;						// 
-		D3D11_INPUT_CLASSIFICATION InputSlotClass;
-		UINT InstanceDataStepRate;
-		*/
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
-
-		// 정점 셰이더 입력 관련 정보 객체 생성
-		ThrowIfFailed(device->CreateInputLayout(
-			inputLayoutDesc
-			, _countof(inputLayoutDesc)
-			, vertexShaderObject->GetBufferPointer()
-			, vertexShaderObject->GetBufferSize(),
-			&inputLayout), L"Failed to create input layout");
-
-
-		ID3DBlob* pixelShaderObject = nullptr;
-
-		// Shader 컴파일
-		ThrowIfFailed(D3DCompileFromFile(
-			L"HLSLShaders/DefaultPS.hlsl",			// 파일명
-			nullptr,								// 
-			nullptr,
-			"main",									// 엔트리 포인트 - shader 파일의 시작점 함수 이름?
-			// [CODEX 답변] Pixel Shader에서도 Compile을 시작할 HLSL 함수 이름이다.
-			// 바로 다음 Target인 ps_5_0이 이 함수를 Pixel Shader로 Compile하도록 Stage를 결정한다.
-			"ps_5_0",								// 셰이더 모델 버전
-			0,
-			0,
-			&pixelShaderObject,
-			nullptr
-		), L"Failed to compile pixel shader");
-
-		// 픽셀 셰이더 객체 생성
-		ThrowIfFailed(
-			device->CreatePixelShader(
-				pixelShaderObject->GetBufferPointer(),
-				pixelShaderObject->GetBufferSize(),
-				nullptr,
-				&pixelShader)
-			, L"Failed to create pixel shader");
-
-		SafeRelease(vertexShaderObject);
-		SafeRelease(pixelShaderObject);
 	}
 
 	void Renderer::CreateViewport(uint32_t width, uint32_t height)

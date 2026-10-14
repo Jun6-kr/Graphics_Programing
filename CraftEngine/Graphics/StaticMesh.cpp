@@ -68,6 +68,22 @@ namespace Craft
 	{
 		return std::make_shared<StaticMesh>(
 			std::vector<Vector3> { Vector3{ 0.0f, 0.5f, 0.5f }, Vector3{ 0.5f, -0.5f, 0.5f }, Vector3{ -0.5f, -0.5f, 0.5f }}
-		, std::vector <uint32_t> {0, 1, 2});
+		, std::vector <uint32_t> {0, 1, 2});	// 왼손 좌표계 순서에 맞기만 하면, 시작 순서는 크게 관련 X
+		// [CODEX 답변] 시작 정점 자체보다 Winding Order(시계/반시계 방향)가 중요하다.
+		// 같은 방향을 유지하는 0, 1, 2와 1, 2, 0은 같은 면이지만, 순서를 뒤집으면 앞면과 뒷면 판정이 바뀐다.
+	}
+	std::shared_ptr<StaticMesh> StaticMesh::CreateQuadMesh()
+	{
+		return std::make_shared<StaticMesh>(
+			std::vector<Vector3> { Vector3{ -0.5f, 0.5f, 0.5f }, Vector3{ 0.5f, 0.5f, 0.5f }, Vector3{ 0.5f, -0.5f, 0.5f }, Vector3{ -0.5f, -0.5f, 0.5f } }
+		//, std::vector <uint32_t> {0, 1, 2, 3});
+		, std::vector <uint32_t> { 0, 1, 2, 0, 2, 3 });
+		/*
+			[Codex] 굳이 사각형을 삼각형 2개로 만드는 이유?
+			[CODEX 답변]
+			Direct3D의 기본 Primitive는 점, 선, 삼각형이며 사각형 Primitive는 따로 없다.
+			따라서 Triangle List에서 인덱스 { 0, 1, 2 }와 { 0, 2, 3 }으로 두 삼각형을 만들고,
+			두 삼각형이 대각선 정점 0과 2를 공유해 하나의 사각형 영역을 채우도록 구성한다.
+		*/
 	}
 }

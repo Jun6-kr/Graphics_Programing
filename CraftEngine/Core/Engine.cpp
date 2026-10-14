@@ -168,7 +168,7 @@ namespace Craft
         // 이벤트 전달
         if (renderer)
         {
-            renderer->Draw(0.7f, 0.3f, 0.12f, 0);
+            renderer->Draw(0.2f, 0.2f, 0.2f, 0);
         }
     }
 
