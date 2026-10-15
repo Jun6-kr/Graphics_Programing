@@ -2,6 +2,7 @@
 
 #include <d3d11.h>
 #include <string>
+#include <memory>
 
 namespace Craft
 {
@@ -9,11 +10,14 @@ namespace Craft
 	class Shader
 	{
 	public:
-		Shader(const std::wstring& vertexPath, const std::wstring& pixelPath);
+		Shader(const std::wstring& shaderName);
 		~Shader();
 
 		// 그래픽스 파이프라인에 셰이더 객체 바인딩
 		void Bind();
+
+		// 편의 함수 - 기본 셰이더 생성 함수
+		static std::shared_ptr<Shader> CreateDefaultShader();
 
 	private:
 		// 정점 셰이더
