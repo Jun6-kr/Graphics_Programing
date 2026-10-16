@@ -47,6 +47,13 @@ namespace Craft
 		static Matrix4 Rotation(float x, float y, float z);
 		static Matrix4 Rotation(const Vector3& rotation);
 
+		// 카메라 변환 행렬 생성 함수
+		static Matrix4 LookAt(
+			const Vector3& eye			// 카메라의 위치
+			, const Vector3& target		// 카메라가 바라봐야 하는 위치
+			, const Vector3& upVector	// 카메라 기준 좌표 생성을 위해 외적에 사용할 벡터
+		);
+
 		// TO. Codex
 		// 언리얼의 회전 계산이 회전 행렬의 x축을 떼서 쓴다는 얘기를 들었는데, 이걸 설명해줘
 		// [CODEX 답변]
