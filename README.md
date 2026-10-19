@@ -151,3 +151,4 @@ Q. 질문 원문 또는 핵심 질문
 - [2026-10-14](DevLog/daily/2026-10-14.md) — Shader 리소스 분리, 객체별 Mesh·Shader 제출, Draw Call과 Pass 학습 메모 정리
 - [2026-10-15](DevLog/daily/2026-10-15.md) — StaticMeshComponent 렌더 제출, 정보 전달 파이프라인, 배칭·Shader Compile·모델 Import 메모 정리
 - [2026-10-16](DevLog/daily/2026-10-16.md) — LookAt 뷰 행렬, 그래픽스 파이프라인 단계, 동차좌표·SRT·외적·카메라 역변환 정리
+- [2026-10-19](DevLog/daily/2026-10-19.md) — Camera View Constant Buffer, HLSL b1 바인딩, SV_POSITION·NDC·Projection 메모 정리

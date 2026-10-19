@@ -25,6 +25,12 @@
 | Q-012 | Transform | World Matrix의 S × R × T 순서가 왜 중요한가? | `Transform::Update()` |
 | Q-013 | Matrix | 정규 직교 회전 행렬에서 왜 전치가 역행렬인가? | `Matrix4` |
 | Q-014 | Architecture | 버퍼 생성은 Renderer에 요청하는 설계가 올바른가? | `Renderer.h` |
+| Q-015 | Camera | Camera 수에 따라 Constant Buffer 수도 달라져야 하는가? | `Renderer` |
+| Q-016 | Shader | HLSL cbuffer의 Slot은 선언 순서로 정해지는가? | `DefaultVS.hlsl` |
+| Q-017 | Pipeline | `SV_POSITION`은 무엇이며 반환값은 NDC인가? | `DefaultVS.hlsl` |
+| Q-018 | Math | 그래픽스에서 투영은 무엇인가? | Projection Matrix |
+| Q-019 | Buffer | 이번에 늘어난 것은 Vertex Buffer인가? | `Renderer` |
+| Q-020 | Architecture | RenderCommand와 Camera 데이터는 왜 별도로 전달하는가? | `Renderer`, `TestLevel` |
 
 ## 기존 코드 질문
 
@@ -344,3 +350,154 @@
 **남은 질문**
 
 > 없음.
+
+## 2026-10-19
+
+<a id="q-015"></a>
+### Q-015. Camera 수에 따라 Constant Buffer 수도 달라져야 하는가?
+
+**몰랐던 부분**
+
+- Camera가 한 개일 때와 여러 개일 때 Camera Buffer 객체 수도 달라져야 하는지 불명확했습니다.
+
+**알게 된 내용**
+
+- Camera 개수와 D3D Constant Buffer 객체 개수가 반드시 일치할 필요는 없습니다.
+- 하나의 Dynamic Buffer를 Camera별 Render Pass 전에 갱신해 재사용할 수 있습니다.
+- 여러 Camera 데이터를 동시에 참조하거나 병렬 Command 생성, Frame 중 데이터 보존이 필요하다면 Camera별 Buffer나 Ring Buffer가 필요할 수 있습니다.
+- 핵심 기준은 Camera 개수 자체가 아니라 Render 순서와 데이터 수명입니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.h`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `Game/Test/TestLevel.cpp`
+- `DevLog/daily/2026-10-19.md`
+
+**남은 질문**
+
+- 여러 Camera가 서로 다른 Viewport와 Render Target을 사용할 때의 Render Pass 구조는 아직 구현하지 않았습니다.
+
+<a id="q-016"></a>
+### Q-016. HLSL cbuffer의 Slot은 선언 순서로 정해지는가?
+
+**몰랐던 부분**
+
+- `register`를 적지 않았을 때 선언 순서가 곧 `b0`, `b1` 순서가 되는지 혼동했습니다.
+- 선언 순서와 명시적인 `register(bN)` 중 무엇이 우선하는지 확인이 필요했습니다.
+
+**알게 된 내용**
+
+- `register(bN)`을 명시하면 선언 위치와 관계없이 지정한 Slot에 배정됩니다.
+- `Buffer1 : register(b1)`을 먼저 선언하고 `Buffer2 : register(b0)`을 나중에 선언해도 각각 `b1`, `b0`입니다.
+- `register`를 생략하면 Compiler가 Slot을 자동 배정할 수 있으므로 C++ Binding과의 계약을 선언 순서에 의존하지 않는 편이 안전합니다.
+- HLSL의 `bN`과 C++의 `VSSetConstantBuffers(N, ...)`가 일치해야 합니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/HLSLShaders/DefaultVS.hlsl`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `DevLog/daily/2026-10-19.md`
+
+**남은 질문**
+
+> 없음.
+
+<a id="q-017"></a>
+### Q-017. `SV_POSITION`은 무엇이며 Vertex Shader 반환값은 NDC인가?
+
+**몰랐던 부분**
+
+- `SV_POSITION`이 반드시 전달해야 하는 값인지 불명확했습니다.
+- Vertex Shader가 반환하는 위치를 NDC로 이해하고 있었습니다.
+
+**알게 된 내용**
+
+- `SV_POSITION`은 Rasterizer가 정점 위치로 해석하는 System-Value Semantic입니다.
+- 삼각형을 Rasterize하려면 Vertex Shader가 최종 위치를 `SV_POSITION`으로 전달해야 합니다.
+- Vertex Shader 출력은 Clip Space의 `(x, y, z, w)`이며 아직 NDC가 아닙니다.
+- 이후 GPU가 `x/w`, `y/w`, `z/w` Perspective Divide를 수행한 결과가 NDC입니다.
+- Direct3D NDC는 X와 Y가 `-1 ~ 1`, Z가 `0 ~ 1`입니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/HLSLShaders/DefaultVS.hlsl`
+- `DevLog/daily/2026-10-19.md`
+
+**남은 질문**
+
+- 현재 Shader에 Projection Matrix가 없어 View Space 좌표를 Clip Space 위치처럼 반환하는 임시 상태입니다.
+
+<a id="q-018"></a>
+### Q-018. 그래픽스에서 투영은 무엇인가?
+
+**몰랐던 부분**
+
+- 실제 3차원 좌표를 화면 좌표로 바꾸는 “투영”이 어떤 계산인지 알지 못했습니다.
+
+**알게 된 내용**
+
+- Projection은 Camera/View Space의 시야 절두체를 GPU가 처리할 수 있는 표준 Clip Space로 옮기는 변환입니다.
+- Perspective Projection은 거리, 시야각, Aspect Ratio, Near/Far Plane을 반영합니다.
+- Projection 결과의 `w`로 좌표를 나누는 Perspective Divide가 멀리 있는 물체를 작게 보이게 만듭니다.
+- 단순히 Z를 제거하는 과정이 아니며 깊이 정보는 Depth Test를 위해 유지·변환됩니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/HLSLShaders/DefaultVS.hlsl`
+- `DevLog/daily/2026-10-19.md`
+
+**남은 질문**
+
+- Perspective Projection Matrix의 각 항이 FOV, Aspect, Near, Far에서 유도되는 과정은 후속 학습이 필요합니다.
+
+<a id="q-019"></a>
+### Q-019. 이번에 늘어난 것은 Vertex Buffer인가?
+
+**몰랐던 부분**
+
+- Shader에 전달하는 Buffer가 추가됐다는 점 때문에 Vertex Buffer가 늘어난 것으로 표현했습니다.
+
+**알게 된 내용**
+
+- 이번에 추가된 것은 Camera View Matrix를 전달하는 Constant Buffer입니다.
+- Vertex Buffer는 Mesh의 정점 위치와 속성을 저장합니다.
+- Constant Buffer는 World, View 같은 Shader Parameter를 전달합니다.
+- 둘 다 GPU Buffer지만 Pipeline에서 연결되는 Stage와 데이터의 의미가 다릅니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.h`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `CraftEngine/HLSLShaders/DefaultVS.hlsl`
+- `DevLog/daily/2026-10-19.md`
+
+**남은 질문**
+
+> 없음.
+
+<a id="q-020"></a>
+### Q-020. RenderCommand와 Camera 데이터는 왜 별도로 전달하는가?
+
+**몰랐던 부분**
+
+- `RenderCommand`는 물체마다 존재하지만 Camera는 물체와 무관하므로 데이터를 어떻게 전달해야 하는지 불명확했습니다.
+- 상용 Engine에서는 Renderer가 Camera에 존재하는지 궁금했습니다.
+
+**알게 된 내용**
+
+- World Matrix, Mesh, Shader는 물체별 정보이므로 현재 `RenderCommand`에 저장됩니다.
+- View Matrix는 같은 Camera로 그리는 여러 물체가 공유하므로 Camera/View 단위 데이터로 별도 제출할 수 있습니다.
+- 일반적으로 Camera는 View·Projection과 Render Target 같은 렌더링 조건을 제공하고 중앙 Renderer나 Render Pipeline이 Camera 기준으로 장면을 그립니다.
+- Renderer가 Camera에 소유된다는 구조가 모든 상용 Engine에 공통으로 적용되는 것은 아닙니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.h`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `Game/Test/TestLevel.cpp`
+- `DevLog/daily/2026-10-19.md`
+
+**남은 질문**
+
+- Camera 객체와 Render View 또는 Render Pass의 책임 경계는 Camera 클래스 도입 시 결정해야 합니다.
