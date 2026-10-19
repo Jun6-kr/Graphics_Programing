@@ -4,6 +4,8 @@
 #include <Component/StaticMeshComponent.h>
 #include <Graphics/Shader.h>
 #include <Graphics/StaticMesh.h>
+#include <Graphics/Renderer.h>
+#include <Math/Matrix4.h>
 #include <memory>
 
 using namespace Craft;
@@ -41,4 +43,16 @@ void TestLevel::Initialized()
 	center->GetTransform().scale = Vector3::One * 0.4f;
 	center->GetComponent<StaticMeshComponent>()->SetStaticMesh(quad);
 	center->GetComponent<StaticMeshComponent>()->SetShader(shader);
+}
+
+void TestLevel::Draw()
+{
+	Level::Draw();
+
+	// 뷰 행렬 제출 - 카메라 역할(이 프로젝트에선 카메라는 유일)
+	Vector3 eye(0.0f, 0.0f, 0.0f);
+	Vector3 target = eye + Vector3::Forward;
+	Matrix4 view = Matrix4::LookAt(eye, target, Vector3::Up);
+
+	Renderer::Get().SubmitCamera(view);
 }

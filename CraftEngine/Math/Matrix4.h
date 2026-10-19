@@ -69,7 +69,7 @@ namespace Craft
 		Matrix4 operator* (const Matrix4 other) const;
 		Matrix4& operator*= (const Matrix4 other);
 
-		// 백터와 행렬 곱
+		// [백터와 행렬 곱]
 		// 행벡터로 사용해서 처리 -> 벡터가 좌측에 있어야 가능 // 언리얼이 이래서 (OpenGL이나 다른 교재에서는 열벡터로 처리)
 		// 행렬 곱 계산 시 행 x 열 로 처리하기 때문
 		friend Vector3 operator* (const Vector3& vector, const Matrix4& matrix);

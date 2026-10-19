@@ -31,6 +31,13 @@ namespace Craft
 			std::shared_ptr<Shader> shader;
 		};
 
+		// 카메라 데이터
+		struct CameraBufferData
+		{
+			// 뷰 변환 행렬
+			Matrix4 viewMatrix = Matrix4::Identity;
+		};
+
 	public:
 		Renderer(const Win32Window& window);
 		~Renderer();
@@ -39,6 +46,9 @@ namespace Craft
 
 		// 그리기에 필요한 데이터 제출 함수
 		void Submit(const std::shared_ptr<StaticMesh>& staticMesh, const std::shared_ptr<Shader>& shader, const Matrix4& worldMatrix);
+
+		// 카메라 행렬 데이터 제출 함수
+		void SubmitCamera(const Matrix4& viewMatrix);
 
 		// 크기 변경 이벤트 함수
 		void OnResize(uint32_t width, uint32_t height);
@@ -78,9 +88,13 @@ namespace Craft
 
 		void CreateViewport(uint32_t width, uint32_t height);
 
-		// 트랜스폼 상수 버퍼 생성 및 갯ㅇ신 함수
+		// 트랜스폼 상수 버퍼 생성 및 갱신 함수
 		void CreateTansformBuffer();
 		void UpdateTrnasformBuffer(const Matrix4& worldMatrix);
+
+		// 카메라 상수 버퍼 생성 및 갱신 함수
+		void CreateCameraBuffer();
+		void UpdateCameraBuffer();
 
 	private:
 		// 전역 접근 가능하도록 static 변수 선언
@@ -104,6 +118,12 @@ namespace Craft
 
 		// 트랜스폼 데이터를 전달할 사우 버퍼
 		ID3D11Buffer* transformBuffer = nullptr;
+
+		// 카메라 버퍼 데이터
+		CameraBufferData cameraData;
+
+		// 카메라 버퍼 데이터를 전달할 상수 버퍼
+		ID3D11Buffer* cameraBuffer = nullptr;
 
 		// 뷰포트 - 화면을 어떻게 사용할지 정의하는 구조체
 		D3D11_VIEWPORT viewport = {};
