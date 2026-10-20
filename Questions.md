@@ -31,6 +31,7 @@
 | Q-018 | Math | 그래픽스에서 투영은 무엇인가? | Projection Matrix |
 | Q-019 | Buffer | 이번에 늘어난 것은 Vertex Buffer인가? | `Renderer` |
 | Q-020 | Architecture | RenderCommand와 Camera 데이터는 왜 별도로 전달하는가? | `Renderer`, `TestLevel` |
+| Q-021 | Projection | FOV와 Focal Length는 화면의 물체 크기에 어떤 영향을 주는가? | Perspective Projection |
 
 ## 기존 코드 질문
 
@@ -441,15 +442,19 @@
 - Perspective Projection은 거리, 시야각, Aspect Ratio, Near/Far Plane을 반영합니다.
 - Projection 결과의 `w`로 좌표를 나누는 Perspective Divide가 멀리 있는 물체를 작게 보이게 만듭니다.
 - 단순히 Z를 제거하는 과정이 아니며 깊이 정보는 Depth Test를 위해 유지·변환됩니다.
+- 세로 FOV를 `θ`라고 하면 정규화된 Y Scale은 `S_y = 1 / tan(θ/2)`입니다.
+- 삼각형의 닮음으로 `y_NDC = y × S_y / z`가 나오며, X는 `S_x = S_y / aspect`를 사용합니다.
+- Projection Matrix는 Clip Space의 `w`에 View Space 깊이를 담아 GPU의 Perspective Divide 후 `x/z`, `y/z` 관계가 나오도록 구성합니다.
 
 **관련 코드·문서**
 
 - `CraftEngine/HLSLShaders/DefaultVS.hlsl`
 - `DevLog/daily/2026-10-19.md`
+- `DevLog/daily/2026-10-20.md`
 
 **남은 질문**
 
-- Perspective Projection Matrix의 각 항이 FOV, Aspect, Near, Far에서 유도되는 과정은 후속 학습이 필요합니다.
+- FOV와 Aspect Ratio에 따른 X/Y 항은 확인했습니다. Near/Far를 Direct3D NDC Z `0 ~ 1`로 옮기는 항은 후속 학습이 필요합니다.
 
 <a id="q-019"></a>
 ### Q-019. 이번에 늘어난 것은 Vertex Buffer인가?
@@ -501,3 +506,30 @@
 **남은 질문**
 
 - Camera 객체와 Render View 또는 Render Pass의 책임 경계는 Camera 클래스 도입 시 결정해야 합니다.
+
+## 2026-10-20
+
+<a id="q-021"></a>
+### Q-021. FOV와 Focal Length는 화면의 물체 크기에 어떤 영향을 주는가?
+
+**몰랐던 부분**
+
+- FOV가 커질 때 같은 물체가 화면에서 커지는지 작아지는지 혼동했습니다.
+- FOV와 정규화된 Focal Length의 관계를 Projection Scale과 연결하지 못했습니다.
+
+**알게 된 내용**
+
+- 세로 반높이를 1로 둔 Projection Plane에서는 `d = 1 / tan(FOV_y/2)`입니다.
+- FOV가 커지면 `d`와 Projection Scale이 작아지고 더 넓은 영역이 보이므로 같은 물체는 화면에서 작아집니다.
+- FOV가 작아지면 `d`와 Projection Scale이 커지고 좁은 영역을 확대하므로 같은 물체는 크게 보입니다.
+- 이 관계는 물체 크기와 Camera까지의 거리를 고정했을 때 성립합니다.
+- 여기서 `d`는 정규화된 Projection Plane의 Scale이며 실제 Lens의 mm 단위 초점거리와 그대로 같은 값은 아닙니다.
+
+**관련 코드·문서**
+
+- `DevLog/daily/2026-10-20.md`
+- 사용자 제공 Perspective Projection 학습 자료
+
+**남은 질문**
+
+- 실제 Camera Lens의 Sensor 크기·Focal Length와 Engine의 FOV 변환 관계는 별도 학습이 필요합니다.
