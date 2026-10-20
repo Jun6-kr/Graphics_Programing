@@ -352,6 +352,8 @@ namespace Craft
 	{
 		// 버퍼와 연결할 리소스 생성
 		D3D11_MAPPED_SUBRESOURCE mapped = {};
+
+		// 버퍼와 연결
 		ThrowIfFailed(context->Map(cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped), L"Failed to map camera buffer");
 
 		// 업데이트 할 데이터 설정
