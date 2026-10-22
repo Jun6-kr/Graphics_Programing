@@ -153,3 +153,4 @@ Q. 질문 원문 또는 핵심 질문
 - [2026-10-16](DevLog/daily/2026-10-16.md) — LookAt 뷰 행렬, 그래픽스 파이프라인 단계, 동차좌표·SRT·외적·카메라 역변환 정리
 - [2026-10-19](DevLog/daily/2026-10-19.md) — Camera View Constant Buffer, HLSL b1 바인딩, SV_POSITION·NDC·Projection 메모 정리
 - [2026-10-20](DevLog/daily/2026-10-20.md) — PCH·Build-time Shader Compile, CSO Load, View Frustum·FOV·Perspective Projection X/Y 유도
+- [2026-10-22](DevLog/daily/2026-10-22.md) — CameraComponent, View·Projection 제출, 원근 투영·카메라 역변환 행렬, WVP Constant Buffer 연결

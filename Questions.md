@@ -32,6 +32,8 @@
 | Q-019 | Buffer | 이번에 늘어난 것은 Vertex Buffer인가? | `Renderer` |
 | Q-020 | Architecture | RenderCommand와 Camera 데이터는 왜 별도로 전달하는가? | `Renderer`, `TestLevel` |
 | Q-021 | Projection | FOV와 Focal Length는 화면의 물체 크기에 어떤 영향을 주는가? | Perspective Projection |
+| Q-022 | Buffer | Camera Buffer에 Projection을 추가하면 생성 크기도 바꿔야 하는가? | `Renderer::CreateCameraBuffer()` |
+| Q-023 | Camera | Camera View용 이동·회전 역행렬은 왜 `T⁻¹ × R⁻¹` 순서인가? | `Matrix4::InverseTranslationRotation()` |
 
 ## 기존 코드 질문
 
@@ -427,7 +429,8 @@
 
 **남은 질문**
 
-- 현재 Shader에 Projection Matrix가 없어 View Space 좌표를 Clip Space 위치처럼 반환하는 임시 상태입니다.
+- 2026-10-22에 Projection Matrix를 추가해 View Space 좌표를 Clip Space로 변환하도록 연결했습니다.
+- Clip Space 이후 Perspective Divide와 Viewport Transform이 실제 Pipeline에서 수행되는 시점을 다시 확인할 필요가 있습니다.
 
 <a id="q-018"></a>
 ### Q-018. 그래픽스에서 투영은 무엇인가?
@@ -454,7 +457,7 @@
 
 **남은 질문**
 
-- FOV와 Aspect Ratio에 따른 X/Y 항은 확인했습니다. Near/Far를 Direct3D NDC Z `0 ~ 1`로 옮기는 항은 후속 학습이 필요합니다.
+- Near/Far를 Direct3D NDC Z `0 ~ 1`로 옮기는 항을 코드로 구현했지만, 식의 유도 과정은 후속 복습이 필요합니다.
 
 <a id="q-019"></a>
 ### Q-019. 이번에 늘어난 것은 Vertex Buffer인가?
@@ -533,3 +536,59 @@
 **남은 질문**
 
 - 실제 Camera Lens의 Sensor 크기·Focal Length와 Engine의 FOV 변환 관계는 별도 학습이 필요합니다.
+
+## 2026-10-22
+
+<a id="q-022"></a>
+### Q-022. Camera Buffer에 Projection을 추가하면 생성 크기도 바꿔야 하는가?
+
+**몰랐던 부분**
+
+- `CameraBufferData`에 Projection Matrix를 추가한 뒤에도 Buffer를 `sizeof(Matrix4)` 크기로 생성해도 되는지 확인이 필요했습니다.
+- Vertex Buffer와 Vertex Shader에 연결되는 Constant Buffer의 차이가 혼동되었습니다.
+
+**알게 된 내용**
+
+- 오늘 변경한 것은 Mesh 정점을 담는 Vertex Buffer가 아니라 Vertex Shader의 `b1`에 연결되는 Camera Constant Buffer입니다.
+- `CameraBufferData`는 View와 Projection 두 `Matrix4`를 가지므로 총 128바이트입니다.
+- 64바이트만 할당하고 `sizeof(CameraBufferData)`인 128바이트를 복사하면 할당 범위를 넘어 쓰게 되므로 생성 크기도 구조체 전체 크기로 맞춰야 합니다.
+- D3D11 Constant Buffer의 `ByteWidth`는 16바이트 배수여야 합니다. 이는 모든 종류의 Buffer가 무조건 16바이트여야 한다는 뜻은 아닙니다.
+- 현재 `Matrix4`는 64바이트이고 두 행렬을 가진 `CameraBufferData`는 128바이트이므로 정렬 조건을 만족합니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.h`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `CraftEngine/HLSLShaders/DefaultVS.hlsl`
+- `DevLog/daily/2026-10-22.md`
+
+**남은 질문**
+
+- HLSL Constant Buffer의 16바이트 Register Packing과 C++ 구조체 Padding은 작은 Scalar·Vector 값을 추가할 때 다시 확인해야 합니다.
+
+<a id="q-023"></a>
+### Q-023. Camera View용 이동·회전 역행렬은 왜 `T⁻¹ × R⁻¹` 순서인가?
+
+**몰랐던 부분**
+
+- Camera의 Position과 Rotation으로 View Matrix를 만들 때 왜 값을 그대로 사용하지 않고 역변환하는지 연결이 필요했습니다.
+- 순방향 Camera Transform과 역변환에서 행렬 순서가 왜 뒤집히는지 불명확했습니다.
+
+**알게 된 내용**
+
+- View 변환은 Camera를 실제로 이동시키는 계산이 아니라 World의 점을 Camera 기준 좌표로 다시 표현하는 계산입니다.
+- 현재 행벡터 규약에서 Scale을 제외한 Camera World Transform은 `R × T`입니다.
+- 곱의 역행렬은 `(R × T)⁻¹ = T⁻¹ × R⁻¹`이므로 적용 순서도 반대로 뒤집힙니다.
+- 이동의 역변환은 Position의 부호를 반대로 한 `Translation(-position)`입니다.
+- 순수 회전 행렬은 정규 직교 행렬이므로 `R⁻¹ = Rᵀ`가 성립해 전치로 역회전을 구할 수 있습니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Math/Matrix4.cpp`
+- `Matrix4::InverseTranslationRotation()`
+- `CraftEngine/Component/CameraComponent.cpp`
+- `DevLog/daily/2026-10-22.md`
+
+**남은 질문**
+
+- Camera에 Scale을 허용할지, 허용한다면 일반 역행렬을 어떻게 처리할지는 아직 결정하지 않았습니다.
