@@ -36,6 +36,9 @@ namespace Craft
 		{
 			// 뷰 변환 행렬
 			Matrix4 viewMatrix = Matrix4::Identity;
+
+			// 투영 변환 행렬
+			Matrix4 projectionMatrix = Matrix4::Identity;
 		};
 
 	public:
@@ -48,7 +51,7 @@ namespace Craft
 		void Submit(const std::shared_ptr<StaticMesh>& staticMesh, const std::shared_ptr<Shader>& shader, const Matrix4& worldMatrix);
 
 		// 카메라 행렬 데이터 제출 함수
-		void SubmitCamera(const Matrix4& viewMatrix);
+		void SubmitCamera(const Matrix4& viewMatrix, const Matrix4& projectionMatrix);
 
 		// 크기 변경 이벤트 함수
 		void OnResize(uint32_t width, uint32_t height);

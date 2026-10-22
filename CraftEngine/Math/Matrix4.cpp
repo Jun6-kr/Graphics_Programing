@@ -133,6 +133,40 @@ namespace Craft
 		return m;
 	}
 
+	Matrix4 Matrix4::Perspective(float fieldOfView, float width, float height, float nearDistance, float farDistance)
+	{
+		// 초점 거리(d, Focal Length)
+		float d = 1.0f / std::tan(fieldOfView * 0.5f * DegreesToRadians);
+
+		// 화면비 (Aspect Ratio)
+		float aspect = width / height;
+
+		// y의 scale 계수
+		float sy = d;
+
+		// x의 scale 계수
+		float sx = sy / aspect;
+
+		// A와 B
+		float a = farDistance / (farDistance - nearDistance);
+		float b = -nearDistance * a;
+
+		Matrix4 m;
+		m.m00 = sx;		m.m01 = 0.0f;	m.m02 = 0.0f;	m.m03 = 0.0f;
+		m.m10 = 0.0f;	m.m11 = sy;		m.m12 = 0.0f;	m.m13 = 0.0f;
+		m.m20 = 0.0f;	m.m21 = 0.0f;	m.m22 = a;		m.m23 = 1.0f;
+		m.m30 = 0.0f;	m.m31 = 0.0f;	m.m32 = b;		m.m33 = 0.0f;
+
+		return m;
+	}
+
+	Matrix4 Matrix4::InverseTranslationRotation(const Vector3& position, const Vector3& rotation)
+	{
+		// 순방향 변환 -> S x R x T
+		// 역방향 변환 -> T^-1 x R^-1 X S^-1
+		return Translation(position * -1.0f) * InverseRotation(Rotation(rotation));
+	}
+
 	// X축 회전
 	Matrix4 Matrix4::RotationX(float angle)
 	{

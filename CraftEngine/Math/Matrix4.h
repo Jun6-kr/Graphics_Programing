@@ -54,6 +54,18 @@ namespace Craft
 			, const Vector3& upVector	// 카메라 기준 좌표 생성을 위해 외적에 사용할 벡터
 		);
 
+		// 원근 투영 행렬을 생성하는 함수
+		static Matrix4 Perspective(
+			float fieldOfView		// FOV: 세로 화각(시야각)
+			, float width			// 가로 해상도
+			, float height			// 세로 해상도
+			, float nearDistance	// 근평면(near)의 거리값
+			, float farDistance		// 원평면(far)의 거리값
+		);
+
+		// 이동/회전의 역변환 행렬 생성 함수
+		static Matrix4 InverseTranslationRotation(const Vector3& position, const Vector3& rotation);
+
 		// TO. Codex
 		// 언리얼의 회전 계산이 회전 행렬의 x축을 떼서 쓴다는 얘기를 들었는데, 이걸 설명해줘
 		// [CODEX 답변]

@@ -141,6 +141,16 @@ namespace Craft
         return *instance;
     }
 
+    uint32_t Engine::GetClientWidth() const
+    {
+        return window ? window->GetWidth() : 0;
+    }
+
+    uint32_t Engine::GetClientHeight() const
+    {
+        return window ? window->GetHeight() : 0;
+    }
+
     void Engine::BeginPlay()
     {
         if (mainLevel)

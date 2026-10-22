@@ -67,9 +67,18 @@ namespace Craft
 		renderCommandList.emplace_back(command);
 	}
 
-	void Renderer::SubmitCamera(const Matrix4& viewMatrix)
+	void Renderer::SubmitCamera(const Matrix4& viewMatrix, const Matrix4& projectionMatrix)
 	{
 		cameraData.viewMatrix = viewMatrix;
+		cameraData.projectionMatrix = projectionMatrix;
+
+		// [CODEX]
+		// 여기서 UpdateCameraBuffer 해줄 수도 있다
+		// 카메라가 움직이지 않으면 Update를 하지 않는다?
+		// [CODEX 답변]
+		// SubmitCamera()는 CPU 측 cameraData만 제출하고, 실제 GPU Buffer 갱신은 DrawScene()에서
+		// 한 번 수행하는 현재 구조가 역할 분리에 맞다. Camera가 움직이지 않을 때 갱신을 생략하려면
+		// View/Projection 변경 여부를 나타내는 Dirty Flag를 두고 UpdateCameraBuffer() 호출을 조건부로 만들 수 있다.
 	}
 
 	void Renderer::OnResize(uint32_t width, uint32_t height)
@@ -336,7 +345,7 @@ namespace Craft
 	{
 		// 버퍼 구성 정보
 		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.ByteWidth = sizeof(Matrix4);				// 버퍼 크기
+		bufferDesc.ByteWidth = sizeof(CameraBufferData);	// View/Projection 행렬 전체 크기
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;				// 사용 목적
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
