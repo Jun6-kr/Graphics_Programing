@@ -34,6 +34,10 @@
 | Q-021 | Projection | FOV와 Focal Length는 화면의 물체 크기에 어떤 영향을 주는가? | Perspective Projection |
 | Q-022 | Buffer | Camera Buffer에 Projection을 추가하면 생성 크기도 바꿔야 하는가? | `Renderer::CreateCameraBuffer()` |
 | Q-023 | Camera | Camera View용 이동·회전 역행렬은 왜 `T⁻¹ × R⁻¹` 순서인가? | `Matrix4::InverseTranslationRotation()` |
+| Q-024 | Depth | 2D 화면에서 Depth Buffer는 왜 필요하고 어떻게 동작하는가? | `Renderer::CreateDepthStencilView()` |
+| Q-025 | Depth | 깊이순 정렬만으로 Depth Buffer를 대체할 수 있는가? | Render Command 정렬·Depth Test |
+| Q-026 | Pipeline | Color Buffer와 G-Buffer는 같은 것이며 Forward·Deferred의 차이는 무엇인가? | Render Target·G-Buffer |
+| Q-027 | Texture | `D3D11_TEXTURE2D_DESC`와 Mip Level은 무엇을 설명하는가? | Depth Stencil Texture |
 
 ## 기존 코드 질문
 
@@ -592,3 +596,108 @@
 **남은 질문**
 
 - Camera에 Scale을 허용할지, 허용한다면 일반 역행렬을 어떻게 처리할지는 아직 결정하지 않았습니다.
+
+## 2026-10-23
+
+<a id="q-024"></a>
+### Q-024. 2D 화면에서 Depth Buffer는 왜 필요하고 어떻게 동작하는가?
+
+**몰랐던 부분**
+
+- 모니터는 2차원인데 3차원 물체의 앞뒤 관계를 어떤 데이터로 유지하는지 연결이 필요했습니다.
+- 이미 저장된 Depth 값과 새 Fragment의 값 중 어떤 것을 남기는지 확인이 필요했습니다.
+
+**알게 된 내용**
+
+- Depth Buffer는 화면의 각 Pixel 위치에 Color가 아니라 Camera 기준 깊이값을 저장하는 2차원 Texture입니다.
+- 현재 일반적인 Direct3D Projection에서는 Near가 NDC Z `0`, Far가 `1`에 가까우므로 값이 작을수록 Camera에 가깝습니다.
+- Frame 시작 시 Depth를 가장 먼 값인 `1.0`으로 초기화합니다.
+- 기본 `LESS` 비교에서는 새 Fragment의 Depth가 저장된 값보다 작을 때만 Color와 Depth를 갱신합니다.
+- 모니터에 실제 깊이축이 생기는 것은 아니며, GPU가 Pixel별 가시성을 결정하기 위해 깊이를 수치로 보관합니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.cpp`
+- `Renderer::BeginScene()`
+- `Renderer::CreateDepthStencilView()`
+- `DevLog/daily/2026-10-23.md`
+
+**남은 질문**
+
+- Reversed-Z를 사용할 때 Clear 값과 비교 함수가 어떻게 달라지는지는 후속 학습이 필요합니다.
+
+<a id="q-025"></a>
+### Q-025. 깊이순 정렬만으로 Depth Buffer를 대체할 수 있는가?
+
+**몰랐던 부분**
+
+- 먼 물체부터 그려 가까운 물체가 나중에 덮어쓰게 하면 별도의 Depth Buffer가 필요 없는지 궁금했습니다.
+
+**알게 된 내용**
+
+- 단순 장면은 뒤에서 앞으로 정렬하는 Painter's Algorithm으로 앞뒤를 표현할 수 있습니다.
+- 하지만 물체나 삼각형이 서로 교차하거나 가림 관계가 순환하면 물체 단위 정렬만으로 정확한 순서를 만들 수 없습니다.
+- 불투명 물체는 보통 Depth Test와 Depth Write를 사용하고, 앞에서 뒤로 정렬해 불필요한 Pixel Shader 실행을 줄일 수 있습니다.
+- 투명 물체는 일반적으로 Depth Test는 유지하되 Depth Write를 조절하고 뒤에서 앞으로 정렬합니다.
+- 실제 Renderer가 정렬과 Depth Buffer를 함께 사용하는 이유는 정확성과 성능, 투명도 처리 목적이 서로 다르기 때문입니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.cpp`
+- `Renderer::DrawScene()`
+- `DevLog/daily/2026-10-23.md`
+
+**남은 질문**
+
+- Render Command를 불투명·투명 Queue로 나누고 각각 다른 정렬 기준과 Depth State를 적용하는 과정이 필요합니다.
+
+<a id="q-026"></a>
+### Q-026. Color Buffer와 G-Buffer는 같은 것이며 Forward·Deferred의 차이는 무엇인가?
+
+**몰랐던 부분**
+
+- 일반 Color Buffer를 G-Buffer라고 부를 수 있는지 혼동했습니다.
+- Deferred Renderer를 여러 Draw Call의 결과를 나중에 합치는 방식으로만 이해했습니다.
+
+**알게 된 내용**
+
+- 현재 Back Buffer의 Render Target은 최종 Color를 기록하는 Color Buffer이며 그 자체를 일반적으로 G-Buffer라고 부르지는 않습니다.
+- G-Buffer는 Deferred Rendering의 Geometry Pass에서 Albedo, Normal, Material 속성, Depth 등 조명 계산에 필요한 기하 정보를 여러 Render Target에 저장한 묶음입니다.
+- Forward Rendering은 일반적으로 각 물체를 그릴 때 Material과 Lighting을 계산해 최종 Color Target에 직접 기록합니다.
+- Deferred Rendering은 먼저 Geometry를 G-Buffer에 기록하고, 이후 Lighting Pass가 G-Buffer를 읽어 화면의 조명을 계산합니다.
+- 여러 Pass의 결과를 합치는 것은 Deferred의 특징 중 하나지만, 핵심은 Geometry 기록과 Lighting 계산을 분리하는 데 있습니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.cpp`
+- `Renderer::CreateRenderTargetView()`
+- `DevLog/daily/2026-10-23.md`
+
+**남은 질문**
+
+- CraftEngine은 현재 Forward 방식의 단일 Color Target 단계이며 G-Buffer와 Lighting Pass는 구현하지 않았습니다.
+
+<a id="q-027"></a>
+### Q-027. `D3D11_TEXTURE2D_DESC`와 Mip Level은 무엇을 설명하는가?
+
+**몰랐던 부분**
+
+- Texture2D를 생성할 때 Descriptor의 각 값과 Mip Level이 Depth Buffer에 어떤 의미인지 정리가 필요했습니다.
+
+**알게 된 내용**
+
+- `D3D11_TEXTURE2D_DESC`는 Texture의 Width·Height, Mip 개수, Array 크기, Format, Sample 수, Usage, Bind 용도를 설명합니다.
+- Descriptor는 Texture 데이터 자체가 아니라 GPU Resource를 어떤 구조와 용도로 생성할지 전달하는 설정입니다.
+- Mip은 같은 Texture를 해상도별로 축소해 둔 Level이며 일반 Color Texture의 축소 Sampling 품질과 Cache 효율에 사용됩니다.
+- 현재 Depth Stencil은 화면과 같은 크기의 한 Level만 필요하므로 `MipLevels = 1`을 사용합니다.
+- `DXGI_FORMAT_D24_UNORM_S8_UINT`는 24비트 Depth와 8비트 Stencil을 한 Texture에 저장합니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.cpp`
+- `Renderer::CreateDepthStencilView()`
+- `DevLog/daily/2026-10-23.md`
+
+**남은 질문**
+
+- 일반 Texture의 Mip Chain 생성 방식과 Depth Pyramid·Hi-Z는 후속 학습이 필요합니다.
