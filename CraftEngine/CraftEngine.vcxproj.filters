@@ -126,5 +126,7 @@
   <ItemGroup>
     <FxCompile Include="HLSLShaders\DefaultVS.hlsl" />
     <FxCompile Include="HLSLShaders\DefaultPS.hlsl" />
+    <FxCompile Include="HLSLShaders\YellowPS.hlsl" />
+    <FxCompile Include="HLSLShaders\YellowVS.hlsl" />
   </ItemGroup>
 </Project>

@@ -89,6 +89,9 @@ namespace Craft
 		// 렌더 타켓 뷰 생성
 		void CreateRenderTargetView();
 
+		// 뎁스 스텐실 뷰 생성
+		void CreateDepthStencilView(uint32_t width, uint32_t height);
+
 		void CreateViewport(uint32_t width, uint32_t height);
 
 		// 트랜스폼 상수 버퍼 생성 및 갱신 함수
@@ -118,6 +121,12 @@ namespace Craft
 
 		// 백버퍼를 대표하는 렌더 타겟 - 그래픽 카드에 그릴 대상을 선정할 떄 사용하는 타입
 		ID3D11RenderTargetView* renderTargetView = nullptr;
+
+		// 깊이 처리를 위한 깊이 버퍼 (공간활용을 위해 stencil도 같이 저장)
+		ID3D11Texture2D* depthStencilBuffer = nullptr;
+
+		// 깊이 버퍼를 그래픽카드에 전달하는 깊이 뷰
+		ID3D11DepthStencilView* depthStencilView = nullptr;
 
 		// 트랜스폼 데이터를 전달할 사우 버퍼
 		ID3D11Buffer* transformBuffer = nullptr;

@@ -135,6 +135,11 @@ namespace Craft
 
 	Matrix4 Matrix4::Perspective(float fieldOfView, float width, float height, float nearDistance, float farDistance)
 	{
+		// 값 확인
+		assert(fieldOfView > 0.0f && fieldOfView < 180.0f);
+		assert(width > 0.0f && height > 0.0f);
+		assert(nearDistance > 0.0f && nearDistance < farDistance);
+
 		// 초점 거리(d, Focal Length)
 		float d = 1.0f / std::tan(fieldOfView * 0.5f * DegreesToRadians);
 

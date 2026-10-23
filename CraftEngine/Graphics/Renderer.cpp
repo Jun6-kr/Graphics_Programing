@@ -22,6 +22,9 @@ namespace Craft
 		// 렌더 타겟 뷰 생성
 		CreateRenderTargetView();
 
+		// 뎁스 스텐실 버퍼와 뷰 생성
+		CreateDepthStencilView(window.GetWidth(), window.GetHeight());
+
 		// 부표트 생성 및 바인딩
 		CreateViewport(window.GetWidth(), window.GetHeight());
 
@@ -39,6 +42,8 @@ namespace Craft
 		SafeRelease(transformBuffer);
 		SafeRelease(cameraBuffer);
 
+		SafeRelease(depthStencilView);
+		SafeRelease(depthStencilBuffer);
 		SafeRelease(renderTargetView);
 
 		SafeRelease(swapChain);
@@ -83,11 +88,21 @@ namespace Craft
 
 	void Renderer::OnResize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0)
+		{
+			return;
+		}
+
 		// 원래 크기 확인
 		DXGI_SWAP_CHAIN_DESC desc = {};
 		swapChain->GetDesc(&desc);
 
-		// RenderTargetView 해제 - buffer와 RTV가 연결되어 있는 상태면 크기 변경이 안 된다
+		// Context가 기존 Render Target과 Depth Stencil을 참조하지 않도록 바인딩 해제
+		context->OMSetRenderTargets(0, nullptr, nullptr);
+
+		// 화면 크기에 종속된 View와 Texture 해제
+		SafeRelease(depthStencilView);
+		SafeRelease(depthStencilBuffer);
 		SafeRelease(renderTargetView);
 
 		// 백버퍼 크기 변경
@@ -97,6 +112,9 @@ namespace Craft
 
 		// RTV 재생성
 		CreateRenderTargetView();
+
+		// Depth Stencil 재생성
+		CreateDepthStencilView(width, height);
 
 		// 뷰포트 크기 재설정
 		CreateViewport(width, height);
@@ -112,10 +130,11 @@ namespace Craft
 	void Renderer::BeginScene(float red, float green, float blue)
 	{
 		// 그리기 준비
-		// 배경 지우기 및 그리기 대상 설정
-		context->OMSetRenderTargets(1, &renderTargetView, nullptr);
+		// 색상과 깊이를 기록할 View를 Output Merger에 함께 설정
+		context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 		float backgroundColor[4] = { red, green, blue, 1.0f };
 		context->ClearRenderTargetView(renderTargetView, backgroundColor);
+		context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
 	void Renderer::DrawScene()
@@ -279,6 +298,29 @@ namespace Craft
 		SafeRelease(backBuffer);
 	}
 
+	void Renderer::CreateDepthStencilView(uint32_t width, uint32_t height)
+	{
+		// 설명 구조체(Descriptor)
+		D3D11_TEXTURE2D_DESC depthBufferDesc = {};
+		depthBufferDesc.Width = width;
+		depthBufferDesc.Height = height;
+		depthBufferDesc.MipLevels = 1;
+		depthBufferDesc.ArraySize = 1;
+		depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		// sample desc는 백버퍼와 동일해야 한다
+		depthBufferDesc.SampleDesc.Count = 1;
+		depthBufferDesc.SampleDesc.Quality = 0;
+
+		depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthBufferDesc.CPUAccessFlags = 0;
+		depthBufferDesc.MiscFlags = 0;
+
+		ThrowIfFailed(device->CreateTexture2D(&depthBufferDesc, nullptr, &depthStencilBuffer), L"Failed to create depth stencil buffer");
+		ThrowIfFailed(device->CreateDepthStencilView(depthStencilBuffer, nullptr, &depthStencilView), L"Failed to create depth stencil view");
+	}
+
 	void Renderer::CreateViewport(uint32_t width, uint32_t height)
 	{
 		// 뷰포트 설정
@@ -288,7 +330,7 @@ namespace Craft
 		viewport.Width = static_cast<float>(width);
 		viewport.Height = static_cast<float>(height);
 		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
 
 		// 바인딩
 		context->RSSetViewports(1, &viewport);
