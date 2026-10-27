@@ -7,11 +7,15 @@
 #include <Graphics/StaticMesh.h>
 #include <memory>
 
+#include <Graphics/Texture.h>
+
 using namespace Craft;
 
 void TestLevel::Initialized()
 {
 	Level::Initialized();
+
+	auto texture = Texture::Load("Assets/T_Checker.jpg");
 
 	// 리소스 생성
 	auto triangle = StaticMesh::CreateTriangleMesh();
@@ -37,7 +41,7 @@ void TestLevel::Initialized()
 	right->speed = 600.f;
 	right->GetTransform().scale = Vector3::One * 0.4f;
 	//right->GetTransform().position.x = 0.5f;
-	right->GetTransform().position.z = -1.5f;
+	right->GetTransform().position.z = 1.5f;
 	right->GetComponent<StaticMeshComponent>()->SetStaticMesh(quad);
 	right->GetComponent<StaticMeshComponent>()->SetShader(defaultShader);
 

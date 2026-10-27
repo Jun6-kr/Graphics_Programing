@@ -94,8 +94,8 @@ namespace Craft
 		}
 
 		// 원래 크기 확인
-		DXGI_SWAP_CHAIN_DESC desc = {};
-		swapChain->GetDesc(&desc);
+		//DXGI_SWAP_CHAIN_DESC desc = {};
+		//swapChain->GetDesc(&desc);
 
 		// Context가 기존 Render Target과 Depth Stencil을 참조하지 않도록 바인딩 해제
 		context->OMSetRenderTargets(0, nullptr, nullptr);
@@ -108,7 +108,7 @@ namespace Craft
 		// 백버퍼 크기 변경
 		ThrowIfFailed(swapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_UNKNOWN, 0), L"Failed to resize back buffer");
 
-		swapChain->GetDesc(&desc);
+		//swapChain->GetDesc(&desc);
 
 		// RTV 재생성
 		CreateRenderTargetView();
@@ -132,9 +132,18 @@ namespace Craft
 		// 그리기 준비
 		// 색상과 깊이를 기록할 View를 Output Merger에 함께 설정
 		context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+
 		float backgroundColor[4] = { red, green, blue, 1.0f };
 		context->ClearRenderTargetView(renderTargetView, backgroundColor);
+
+		// 뎁스 스텐실 값 초기화
+		// depth 값을 1로 초기화하는 이유는 요청이 들어왔을 때 depth가 작아야 앞에 오니까(그려지니까)
 		context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	
+		// 뷰표트 설정
+
+		// 레스터라이저 : 점이 몇개 있는 지 판정, 화면의 크기가 점의 위치 판정 시 중요
+		context->RSSetViewports(1, &viewport);
 	}
 
 	void Renderer::DrawScene()
@@ -318,7 +327,14 @@ namespace Craft
 		depthBufferDesc.MiscFlags = 0;
 
 		ThrowIfFailed(device->CreateTexture2D(&depthBufferDesc, nullptr, &depthStencilBuffer), L"Failed to create depth stencil buffer");
-		ThrowIfFailed(device->CreateDepthStencilView(depthStencilBuffer, nullptr, &depthStencilView), L"Failed to create depth stencil view");
+
+		// 뎁스-스텐실 뷰 생성
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+		depthStencilViewDesc.Format = depthBufferDesc.Format;
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		depthStencilViewDesc.Flags = 0;
+
+		ThrowIfFailed(device->CreateDepthStencilView(depthStencilBuffer, &depthStencilViewDesc, &depthStencilView), L"Failed to create depth stencil view");
 	}
 
 	void Renderer::CreateViewport(uint32_t width, uint32_t height)
