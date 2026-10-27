@@ -38,6 +38,7 @@
 | Q-025 | Depth | 깊이순 정렬만으로 Depth Buffer를 대체할 수 있는가? | Render Command 정렬·Depth Test |
 | Q-026 | Pipeline | Color Buffer와 G-Buffer는 같은 것이며 Forward·Deferred의 차이는 무엇인가? | Render Target·G-Buffer |
 | Q-027 | Texture | `D3D11_TEXTURE2D_DESC`와 Mip Level은 무엇을 설명하는가? | Depth Stencil Texture |
+| Q-028 | Resource View | 데이터 Resource와 이를 바라보는 View를 왜 분리하고 무엇을 바인딩하는가? | Texture·RTV·DSV·SRV |
 
 ## 기존 코드 질문
 
@@ -701,3 +702,39 @@
 **남은 질문**
 
 - 일반 Texture의 Mip Chain 생성 방식과 Depth Pyramid·Hi-Z는 후속 학습이 필요합니다.
+
+## 2026-10-27
+
+<a id="q-028"></a>
+### Q-028. 데이터 Resource와 이를 바라보는 View를 왜 분리하고 무엇을 바인딩하는가?
+
+**몰랐던 부분**
+
+- “데이터와 그 데이터를 바라보는 View를 바인딩한다”는 설명에서 Resource와 View가 각각 무엇을 담당하는지 정리가 필요했습니다.
+
+**알게 된 내용**
+
+- Resource는 실제 데이터를 저장합니다. 예를 들어 `ID3D11Texture2D`는 Pixel 또는 Depth 값을 보관할 GPU Texture입니다.
+- View는 Resource 자체를 복제하지 않고, Pipeline이 해당 Resource를 어떤 용도·Format·Subresource 범위로 해석할지 설명합니다.
+- 같은 Texture Resource도 용도와 생성 Flags가 허용하면 RTV, DSV, SRV처럼 서로 다른 View를 통해 사용할 수 있습니다.
+- Output Merger에는 Color Texture 자체가 아니라 RTV를, Depth Texture 자체가 아니라 DSV를 바인딩합니다.
+- Shader에서 일반 Texture를 읽으려면 Texture Resource로 SRV를 만든 다음 `PSSetShaderResources()` 등으로 해당 Shader Stage에 바인딩합니다.
+- Texture의 값을 어떤 방식으로 보간하고 Addressing할지는 별도의 Sampler State가 담당합니다.
+
+```text
+실제 데이터              Pipeline이 보는 방식          바인딩 위치
+Texture2D Color     →    RenderTargetView        →    Output Merger
+Texture2D Depth     →    DepthStencilView        →    Output Merger
+Texture2D Image     →    ShaderResourceView      →    Vertex/Pixel Shader
+```
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Renderer.cpp`
+- `CraftEngine/Graphics/Texture.h`
+- `CraftEngine/Graphics/Texture.cpp`
+- `DevLog/daily/2026-10-27.md`
+
+**남은 질문**
+
+- 현재 `Texture` 클래스는 CPU 이미지 로드까지만 구현됐으며 Texture2D, SRV와 Sampler의 생성·바인딩은 후속 구현이 필요합니다.

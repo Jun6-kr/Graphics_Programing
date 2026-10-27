@@ -155,3 +155,4 @@ Q. 질문 원문 또는 핵심 질문
 - [2026-10-20](DevLog/daily/2026-10-20.md) — PCH·Build-time Shader Compile, CSO Load, View Frustum·FOV·Perspective Projection X/Y 유도
 - [2026-10-22](DevLog/daily/2026-10-22.md) — CameraComponent, View·Projection 제출, 원근 투영·카메라 역변환 행렬, WVP Constant Buffer 연결
 - [2026-10-23](DevLog/daily/2026-10-23.md) — Depth Stencil Texture·View, 깊이 테스트 연결, Yellow Shader, Forward·Deferred·G-Buffer 메모 정리
+- [2026-10-27](DevLog/daily/2026-10-27.md) — stb_image 기반 이미지 로드 시작, Texture 클래스 추가, Resource와 View의 분리·바인딩 메모
