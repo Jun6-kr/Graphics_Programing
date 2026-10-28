@@ -1,11 +1,12 @@
 ﻿#include "StaticMesh.h"
 #include "Renderer.h"
+#include "Vertex.h"
 #include <Core/Core.h>
 #include <cassert>
 
 namespace Craft
 {
-	StaticMesh::StaticMesh(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices)
+	StaticMesh::StaticMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
 	{
 		// 정점 / 인덱스 배열의 항목 수가 0보다 큰지 확인
 		assert(vertices.size() > 0);
@@ -67,7 +68,11 @@ namespace Craft
 	std::shared_ptr<StaticMesh> StaticMesh::CreateTriangleMesh()
 	{
 		return std::make_shared<StaticMesh>(
-			std::vector<Vector3> { Vector3{ 0.0f, 0.5f, 0.5f }, Vector3{ 0.5f, -0.5f, 0.5f }, Vector3{ -0.5f, -0.5f, 0.5f }}
+			std::vector<Vertex> { 
+			Vertex{ Vector3{ 0.0f, 0.5f, 0.5f }, Vector2(0.5f, 0.0f) }
+			, Vertex{ Vector3{ 0.5f, -0.5f, 0.5f }, Vector2(1.0f, 1.0f) }
+			, Vertex{ Vector3{ -0.5f, -0.5f, 0.5f }, Vector2(0.0f, 1.0f) }
+		}
 		, std::vector <uint32_t> {0, 1, 2});	// 왼손 좌표계 순서에 맞기만 하면, 시작 순서는 크게 관련 X
 		// [CODEX 답변] 시작 정점 자체보다 Winding Order(시계/반시계 방향)가 중요하다.
 		// 같은 방향을 유지하는 0, 1, 2와 1, 2, 0은 같은 면이지만, 순서를 뒤집으면 앞면과 뒷면 판정이 바뀐다.
@@ -75,7 +80,12 @@ namespace Craft
 	std::shared_ptr<StaticMesh> StaticMesh::CreateQuadMesh()
 	{
 		return std::make_shared<StaticMesh>(
-			std::vector<Vector3> { Vector3{ -0.5f, 0.5f, 0.5f }, Vector3{ 0.5f, 0.5f, 0.5f }, Vector3{ 0.5f, -0.5f, 0.5f }, Vector3{ -0.5f, -0.5f, 0.5f } }
+			std::vector<Vertex> {
+			Vertex{ Vector3{ -0.5f, 0.5f, 0.5f }, Vector2(0.0f, 0.0f) }
+				, Vertex{ Vector3{ 0.5f, 0.5f, 0.5f }, Vector2(1.0f, 0.0f) }
+				, Vertex{ Vector3{ 0.5f, -0.5f, 0.5f }, Vector2(1.0f, 1.0f) }
+				, Vertex{ Vector3{ -0.5f, -0.5f, 0.5f }, Vector2(0.0f, 1.0f) }
+		}
 		//, std::vector <uint32_t> {0, 1, 2, 3});
 		, std::vector <uint32_t> { 0, 1, 2, 0, 2, 3 });
 		/*

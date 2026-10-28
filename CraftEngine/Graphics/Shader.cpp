@@ -51,13 +51,15 @@ namespace Craft
 		UINT SemanticIndex
 		DXGI_FORMAT Format
 		UINT InputSlot								// 정점
-		UINT AlignedByteOffset;						//
+		UINT AlignedByteOffset;						// 데이터를 읽을 위치 (단위: 바이트)
 		D3D11_INPUT_CLASSIFICATION InputSlotClass;
 		UINT InstanceDataStepRate;
 		*/
+
 		D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			,{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
 		// 정점 셰이더 입력 관련 정보 객체 생성

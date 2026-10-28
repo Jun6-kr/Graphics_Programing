@@ -1,3 +1,10 @@
+// vertex shader input
+struct VSInput
+{
+    float3 position : POSITIONT;
+    float2 uv : TEXCOORD;
+};
+
 // transform constant buffer
 cbuffer TransformBuffer : register(b0)
 {
@@ -12,9 +19,9 @@ cbuffer CameraBuffer : register(b1)
     row_major matrix projection;
 };
 
-float4 main( float3 pos : POSITION ) : SV_POSITION
+float4 main( VSInput input ) : SV_POSITION
 {
-    float4 worldPosition = mul(float4(pos, 1), world);
+    float4 worldPosition = mul(float4(input.position, 1), world);
     float4 viewPosition = mul(worldPosition, view);
     float4 clipPosition = mul(viewPosition, projection);
 
