@@ -39,6 +39,7 @@
 | Q-026 | Pipeline | Color Buffer와 G-Buffer는 같은 것이며 Forward·Deferred의 차이는 무엇인가? | Render Target·G-Buffer |
 | Q-027 | Texture | `D3D11_TEXTURE2D_DESC`와 Mip Level은 무엇을 설명하는가? | Depth Stencil Texture |
 | Q-028 | Resource View | 데이터 Resource와 이를 바라보는 View를 왜 분리하고 무엇을 바인딩하는가? | Texture·RTV·DSV·SRV |
+| Q-029 | Texture Mapping | Mapping과 UV 좌표는 모델의 점을 Texture에 어떻게 대응시키는가? | `Vertex`, Input Layout, Vertex Shader |
 
 ## 기존 코드 질문
 
@@ -738,3 +739,44 @@ Texture2D Image     →    ShaderResourceView      →    Vertex/Pixel Shader
 **남은 질문**
 
 - 현재 `Texture` 클래스는 CPU 이미지 로드까지만 구현됐으며 Texture2D, SRV와 Sampler의 생성·바인딩은 후속 구현이 필요합니다.
+
+## 2026-10-28
+
+<a id="q-029"></a>
+### Q-029. Mapping과 UV 좌표는 모델의 점을 Texture에 어떻게 대응시키는가?
+
+**몰랐던 부분**
+
+- “대응시킨다”는 표현과 Mapping의 의미를 Vertex·Texture 데이터 흐름에 연결할 필요가 있었습니다.
+- 모델의 점에 색상 정보가 함께 있다는 설명과 UV 좌표의 관계가 불명확했습니다.
+
+**알게 된 내용**
+
+- Mapping은 한 데이터 영역의 값을 다른 영역의 값에 대응시키는 과정입니다.
+- Texture Mapping에서는 Mesh의 각 Vertex에 2차원 Texture의 어느 위치를 대응시킬지 UV 좌표로 지정합니다.
+- 보통 `U`는 Texture의 가로축, `V`는 세로축이며 정규화된 `0 ~ 1` 범위를 사용합니다.
+- UV 자체는 Color가 아니라 Texture 위치를 가리키는 좌표입니다. 실제 Color는 Pixel Shader가 UV로 Texture를 Sampling해 얻습니다.
+- Vertex는 Position뿐 아니라 UV, Normal, Tangent, Vertex Color 같은 여러 속성을 함께 가질 수 있습니다. Vertex Color와 UV는 서로 다른 속성입니다.
+- 삼각형 내부의 UV는 Rasterizer가 Vertex별 UV를 보간해 Pixel Shader로 전달합니다.
+
+```text
+Mesh Vertex Position ↔ Vertex UV
+                            ↓
+                    Texture의 위치 지정
+                            ↓
+                   Pixel Shader Sampling
+                            ↓
+                         Color
+```
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Vertex.h`
+- `CraftEngine/Graphics/StaticMesh.cpp`
+- `CraftEngine/Graphics/Shader.cpp`
+- `CraftEngine/HLSLShaders/DefaultVS.hlsl`
+- `DevLog/daily/2026-10-28.md`
+
+**남은 질문**
+
+- 현재 Vertex Shader는 UV를 입력받지만 Pixel Shader로 전달하지 않으며 Texture Sampling도 아직 연결되지 않았습니다.
