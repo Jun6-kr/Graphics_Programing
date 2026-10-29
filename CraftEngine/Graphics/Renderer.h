@@ -14,6 +14,7 @@ namespace Craft
 	class Win32Window;
 	class StaticMesh;
 	class Shader;
+	class Texture;
 
 	// CPU에서 GPU로 명령을 전달
 	class /*CRAFT_API*/ Renderer
@@ -29,6 +30,9 @@ namespace Craft
 
 			// 셰이더
 			std::shared_ptr<Shader> shader;
+
+			// 텍스처
+			std::shared_ptr<Texture> texture;
 		};
 
 		// 카메라 데이터
@@ -48,7 +52,10 @@ namespace Craft
 		void Draw(float red, float green, float blue, uint32_t vsync);
 
 		// 그리기에 필요한 데이터 제출 함수
-		void Submit(const std::shared_ptr<StaticMesh>& staticMesh, const std::shared_ptr<Shader>& shader, const Matrix4& worldMatrix);
+		void Submit(const std::shared_ptr<StaticMesh>& staticMesh
+			, const std::shared_ptr<Shader>& shader
+			, const std::shared_ptr<Texture>& texture
+			,const Matrix4& worldMatrix);
 
 		// 카메라 행렬 데이터 제출 함수
 		void SubmitCamera(const Matrix4& viewMatrix, const Matrix4& projectionMatrix);

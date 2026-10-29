@@ -20,6 +20,6 @@ namespace Craft
 		const Transform& transform = actor->GetTransform();
 
 		// 렌더러에 제출
-		Renderer::Get().Submit(staticMesh, shader, transform.GetWorldMatrix());
+		Renderer::Get().Submit(staticMesh, shader, texture, transform.GetWorldMatrix());
 	}
 }

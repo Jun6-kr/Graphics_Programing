@@ -15,7 +15,7 @@ void TestLevel::Initialized()
 {
 	Level::Initialized();
 
-	auto texture = Texture::Load("Assets/T_Checker.jpg");
+	auto texture = Texture::Load("Assets/T_Checker.png");
 
 	// 리소스 생성
 	auto triangle = StaticMesh::CreateTriangleMesh();
@@ -30,7 +30,7 @@ void TestLevel::Initialized()
 	auto left = SpawnActor<TestActor>();
 	left->speed = 60.f;
 	left->GetTransform().scale = Vector3::One * 0.4f;
-	//left->GetTransform().position.x = -0.5f;
+	left->GetTransform().position.x = -0.5f;
 
 	// 메시 설정
 	left->GetComponent<StaticMeshComponent>()->SetStaticMesh(triangle);
@@ -40,15 +40,20 @@ void TestLevel::Initialized()
 	auto right = SpawnActor<TestActor>();
 	right->speed = 600.f;
 	right->GetTransform().scale = Vector3::One * 0.4f;
-	//right->GetTransform().position.x = 0.5f;
-	right->GetTransform().position.z = 1.5f;
+	right->GetTransform().position.x = 0.5f;
+	//right->GetTransform().position.z = 1.5f;
 	right->GetComponent<StaticMeshComponent>()->SetStaticMesh(quad);
-	right->GetComponent<StaticMeshComponent>()->SetShader(defaultShader);
+	right->GetComponent<StaticMeshComponent>()->SetShader(/*defaultShader*/yellowShader);
+	right->GetComponent<StaticMeshComponent>()->SetTexture(texture);
 
 	auto center = SpawnActor<TestActor>();
 	center->GetTransform().scale = Vector3::One * 0.4f;
-	center->GetComponent<StaticMeshComponent>()->SetStaticMesh(quad);
-	center->GetComponent<StaticMeshComponent>()->SetShader(yellowShader);
+	center->speed = 10.f;
+
+	auto rightMeshComponent = center->GetComponent<StaticMeshComponent>();
+	rightMeshComponent->SetStaticMesh(quad);
+	rightMeshComponent->SetShader(yellowShader);
+	rightMeshComponent->SetTexture(texture);
 
 	auto camera = SpawnActor<TestActor>();
 	camera->AddComponent<CameraComponent>();

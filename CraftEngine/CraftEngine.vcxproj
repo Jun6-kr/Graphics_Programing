@@ -133,7 +133,7 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy HLSLShaders\*.hlsl $(OutDir)\HLSLShaders\ /e /y /i</Command>
+      <Command>xcopy ..\Assets\* $(OutDir)\Assets\ /e /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,7 +159,7 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy HLSLShaders\*.hlsl $(OutDir)\HLSLShaders\ /e /y /i</Command>
+      <Command>xcopy ..\Assets\* $(OutDir)\Assets\ /e /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

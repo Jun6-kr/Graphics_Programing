@@ -1,7 +1,7 @@
 // vertex shader input
 struct VSInput
 {
-    float3 position : POSITIONT;
+    float3 position : POSITION;
     float2 uv : TEXCOORD;
 };
 
