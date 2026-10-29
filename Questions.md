@@ -779,4 +779,90 @@ Mesh Vertex Position ↔ Vertex UV
 
 **남은 질문**
 
-- 현재 Vertex Shader는 UV를 입력받지만 Pixel Shader로 전달하지 않으며 Texture Sampling도 아직 연결되지 않았습니다.
+- `2026-10-29` 구현에서 UV를 Pixel Shader까지 전달하고 Texture Sampling을 연결했습니다.
+- Perspective-correct UV 보간이 일반 선형 보간과 다른 이유는 후속 복습이 필요합니다.
+
+## 2026-10-29
+
+<a id="q-030"></a>
+### Q-030. `SV_POSITION`은 왜 필요하고 Vertex Shader의 위치 출력은 왜 `float4`인가?
+
+**몰랐던 부분**
+
+- Vertex Shader Output의 위치가 첫 번째 멤버여야 하는지, 왜 `float4`로 출력해야 하는지 불명확했습니다.
+- 이동·회전·스케일을 행렬 곱으로 표현하기 위해서만 `float4`가 필요한 것으로 이해하고 있었습니다.
+
+**알게 된 내용**
+
+- `SV_POSITION`은 Rasterizer가 Vertex Shader 출력 중 어느 값이 Clip Space 위치인지 식별하게 하는 System-value Semantic입니다.
+- 위치가 구조체의 첫 번째 멤버여야 하는 것은 아니며 선언 순서보다 `SV_POSITION` Semantic 지정이 중요합니다.
+- Vertex Shader의 위치 출력은 Projection까지 적용된 Clip Space의 동차좌표 `(x, y, z, w)`입니다.
+- GPU는 이 `w`를 Clipping과 Perspective Divide에 사용하고, 이후 `(x/w, y/w, z/w)`를 통해 NDC 좌표를 얻습니다.
+- `float4`는 SRT 행렬 계산뿐 아니라 Projection의 원근 효과를 다음 단계까지 전달하는 데 필요합니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/HLSLShaders/YellowVS.hlsl`
+- `CraftEngine/HLSLShaders/YellowPS.hlsl`
+- `DevLog/daily/2026-10-29.md`
+
+**남은 질문**
+
+- Clip Space에서 GPU가 수행하는 Clipping과 Perspective-correct Interpolation의 세부 과정은 후속 복습이 필요합니다.
+
+<a id="q-031"></a>
+### Q-031. Sampler는 무엇이며 Shader와 Resource를 합치면 Material인가?
+
+**몰랐던 부분**
+
+- Sampler를 Unreal Engine Material Editor의 Texture 관련 Node와 같은 대상으로 이해했습니다.
+- Shader와 Texture·Constant Buffer 같은 Resource의 조합을 Material이라고 부를 수 있는지 확인이 필요했습니다.
+
+**알게 된 내용**
+
+- Texture는 Image Data이고 SRV는 Shader가 해당 Resource를 읽는 방식을 지정하는 View입니다.
+- Sampler State는 Texture의 Pixel 사이를 어떻게 Filtering할지, UV가 범위를 벗어날 때 Wrap·Clamp 등 어떻게 Addressing할지, 어떤 Mip을 선택할지 정합니다.
+- Unreal Engine의 Texture Sample Node는 Texture와 Sampling 연산을 함께 표현하지만 D3D11 Sampler 자체는 Texture가 아니라 읽기 규칙입니다.
+- Material은 보통 Shader Program, Texture와 Constant 같은 Parameter, Sampler 및 Blend·Depth·Rasterizer State 등을 묶은 표면 표현 단위입니다.
+- 따라서 `Shader + Resource`는 Material의 핵심 구성에 가깝지만, 실제 Material은 Render State와 Parameter 관리까지 포함할 수 있습니다.
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Texture.cpp`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `CraftEngine/HLSLShaders/YellowPS.hlsl`
+- `DevLog/daily/2026-10-29.md`
+
+**남은 질문**
+
+- CraftEngine에서 Material이 Shader·Texture·Sampler·Render State 중 어디까지 소유할지는 후속 설계가 필요합니다.
+
+<a id="q-032"></a>
+### Q-032. 하나의 HLSL 파일에서 여러 Shader Stage를 어떻게 Compile하는가?
+
+**몰랐던 부분**
+
+- Visual Studio의 Shader Build 설정에서 Entry Point와 Shader Type을 하나씩만 지정할 수 있어 한 파일의 여러 Stage를 어떻게 처리하는지 궁금했습니다.
+
+**알게 된 내용**
+
+- 한 HLSL 파일에 Vertex Shader와 Pixel Shader를 포함한 여러 Entry Point를 작성할 수 있습니다.
+- 하지만 `fxc.exe`의 한 Compile 명령은 하나의 Entry Point와 하나의 Target Profile을 받아 하나의 Shader Binary를 생성합니다.
+- 같은 파일의 여러 Stage는 Entry Point와 Target을 바꿔 각각 별도로 Compile해야 합니다.
+- Batch File이나 Build Script는 이러한 Compile 명령들을 연속 실행해 여러 `.cso`를 만들 수 있습니다.
+
+```text
+fxc /E VSMain /T vs_5_0 /Fo ShaderVS.cso Shader.hlsl
+fxc /E PSMain /T ps_5_0 /Fo ShaderPS.cso Shader.hlsl
+```
+
+**관련 코드·문서**
+
+- `CraftEngine/HLSLShaders/YellowVS.hlsl`
+- `CraftEngine/HLSLShaders/YellowPS.hlsl`
+- `CraftEngine/CraftEngine.vcxproj`
+- `DevLog/daily/2026-10-29.md`
+
+**남은 질문**
+
+- 현재 프로젝트에서 하나의 HLSL 파일로 Stage를 통합할지, Stage별 파일을 유지할지는 결정되지 않았습니다.
