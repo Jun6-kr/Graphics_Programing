@@ -163,6 +163,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\CameraActor.cpp" />
     <ClCompile Include="Component\CameraComponent.cpp" />
     <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="Component\StaticMeshComponent.cpp" />
@@ -177,14 +178,17 @@
     <ClCompile Include="GameFramework\Level.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
+    <ClCompile Include="Graphics\ShaderManager.cpp" />
     <ClCompile Include="Graphics\StaticMesh.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="Graphics\TextureManager.cpp" />
     <ClCompile Include="Math\Matrix4.cpp" />
     <ClCompile Include="Math\Transform.cpp" />
     <ClCompile Include="Math\Vector2.cpp" />
     <ClCompile Include="Math\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\CameraActor.h" />
     <ClInclude Include="Component\CameraComponent.h" />
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Component\StaticMeshComponent.h" />
@@ -197,8 +201,10 @@
     <ClInclude Include="GameFramework\Level.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Shader.h" />
+    <ClInclude Include="Graphics\ShaderManager.h" />
     <ClInclude Include="Graphics\StaticMesh.h" />
     <ClInclude Include="Graphics\Texture.h" />
+    <ClInclude Include="Graphics\TextureManager.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Interface\IMessageHandler.h" />
     <ClInclude Include="Math\MathDefines.h" />
@@ -225,21 +231,21 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="HLSLShaders\YellowPS.hlsl">
+    <FxCompile Include="HLSLShaders\TextureMappingPS.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HLSLShaders\TextureMappingVS.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="HLSLShaders\YellowVS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)HLSLShaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

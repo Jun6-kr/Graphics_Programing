@@ -66,6 +66,15 @@
     <ClCompile Include="Graphics\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Actor\CameraActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Win32Window.h">
@@ -134,11 +143,22 @@
     <ClInclude Include="Graphics\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Actor\CameraActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSLShaders\DefaultVS.hlsl" />
     <FxCompile Include="HLSLShaders\DefaultPS.hlsl" />
     <FxCompile Include="HLSLShaders\YellowPS.hlsl" />
     <FxCompile Include="HLSLShaders\YellowVS.hlsl" />
+    <FxCompile Include="HLSLShaders\TextureMappingPS.hlsl" />
+    <FxCompile Include="HLSLShaders\TextureMappingVS.hlsl" />
   </ItemGroup>
 </Project>

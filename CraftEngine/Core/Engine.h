@@ -11,6 +11,8 @@ namespace Craft
 	// 전방 선언
 	class Win32Window;
 	class Renderer;
+	class ShaderManager;
+	class TextureManager;
 
 	class Engine : public IMessageHandler
 	{
@@ -69,5 +71,9 @@ namespace Craft
 
 		// 추가 요청된 레벨
 		std::shared_ptr<Level> nextLevel;
+
+		// 셰이더 관리자
+		std::unique_ptr<ShaderManager> shaderManager;
+		std::unique_ptr<TextureManager> textureManager;
 	};
 }
