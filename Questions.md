@@ -835,7 +835,8 @@ Mesh Vertex Position ↔ Vertex UV
 
 **남은 질문**
 
-- CraftEngine에서 Material이 Shader·Texture·Sampler·Render State 중 어디까지 소유할지는 후속 설계가 필요합니다.
+- `2026-11-02` 구현에서 Material이 Shader와 Texture를 소유하고 자체적으로 바인딩하는 구조를 추가했습니다.
+- Sampler를 Texture와 분리해 설정할지, Blend·Depth·Rasterizer State까지 Material이 소유할지는 후속 설계가 필요합니다.
 
 <a id="q-032"></a>
 ### Q-032. 하나의 HLSL 파일에서 여러 Shader Stage를 어떻게 Compile하는가?
@@ -866,3 +867,44 @@ fxc /E PSMain /T ps_5_0 /Fo ShaderPS.cso Shader.hlsl
 **남은 질문**
 
 - 현재 프로젝트에서 하나의 HLSL 파일로 Stage를 통합할지, Stage별 파일을 유지할지는 결정되지 않았습니다.
+
+## 2026-11-02
+
+<a id="q-033"></a>
+### Q-033. Shader마다 다른 Resource 구성을 왜 Material로 관리하는가?
+
+**몰랐던 부분**
+
+- Texture를 사용하지 않는 Shader와 Texture를 여러 개 사용하는 Shader를 같은 Render 구조에서 어떻게 처리할지 정리가 필요했습니다.
+- Renderer나 Component가 Shader와 Texture를 직접 받는 구조에서 Material을 별도로 만드는 이유가 궁금했습니다.
+
+**알게 된 내용**
+
+- Shader마다 요구하는 입력 Resource가 다릅니다. Texture가 없는 Shader도 있고, 여러 Texture·Sampler·Constant Buffer가 필요한 Shader도 있습니다.
+- Renderer가 모든 Resource를 개별 인자로 받으면 새로운 Shader 구성이 추가될 때마다 `Submit()`과 `RenderCommand` 구조를 변경해야 할 수 있습니다.
+- Material은 사용할 Shader와 그 Shader가 필요로 하는 Resource, Parameter 및 Binding 방식을 하나의 표면 표현 단위로 묶습니다.
+- Renderer는 Material 내부의 Texture 개수나 Slot 구성을 몰라도 `Material::Bind()`라는 공통 인터페이스만 호출할 수 있습니다.
+- 따라서 Material은 `Shader + Texture 1개`로 고정된 객체가 아니라 Shader가 요구하는 Resource 구성을 캡슐화하는 객체입니다.
+- 현재 CraftEngine의 `DefaultMaterial`은 Shader만 바인딩하고, `TextureMappingMaterial`은 Shader와 Texture 한 개를 바인딩합니다.
+
+```text
+Renderer
+└─ Material::Bind()
+   ├─ Shader Bind
+   ├─ Texture 0...N Bind
+   ├─ Sampler Bind
+   └─ Constant Buffer / Parameter Bind
+```
+
+**관련 코드·문서**
+
+- `CraftEngine/Graphics/Material.h`
+- `CraftEngine/Graphics/Material.cpp`
+- `CraftEngine/Graphics/Renderer.cpp`
+- `CraftEngine/Component/StaticMeshComponent.cpp`
+- `DevLog/daily/2026-11-02.md`
+
+**남은 질문**
+
+- Shader마다 파생 Material 클래스를 만들지, Resource와 Slot을 데이터로 등록하는 범용 Material 구조를 만들지는 후속 설계가 필요합니다.
+- Object마다 일부 Parameter만 다르게 사용할 Material Instance 구조는 아직 구현되지 않았습니다.
