@@ -176,6 +176,7 @@
     </ClCompile>
     <ClCompile Include="GameFramework\Actor.cpp" />
     <ClCompile Include="GameFramework\Level.cpp" />
+    <ClCompile Include="Graphics\Material.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\ShaderManager.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="CraftEnginePCH.h" />
     <ClInclude Include="GameFramework\Actor.h" />
     <ClInclude Include="GameFramework\Level.h" />
+    <ClInclude Include="Graphics\Material.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\ShaderManager.h" />

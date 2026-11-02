@@ -6,8 +6,7 @@
 namespace Craft
 {
 	class StaticMesh;
-	class Shader;
-	class Texture;
+	class Material;
 
 	class StaticMeshComponent : public Component
 	{
@@ -19,17 +18,13 @@ namespace Craft
 
 		// Setter
 		inline void SetStaticMesh(const std::shared_ptr<StaticMesh>& newMesh) { staticMesh = newMesh; }
-		inline void SetShader(const std::shared_ptr<Shader>& newShader) { shader = newShader; }
-		inline void SetTexture(const std::shared_ptr<Texture>& newTexture) { texture = newTexture; }
+		inline void SetMaterial(const std::shared_ptr<Material>& newMaterial) { material = newMaterial; }
 
 	private:
 		// Static Mesh
 		std::shared_ptr<StaticMesh> staticMesh;
 
-		// Shader
-		std::shared_ptr<Shader> shader;
-
-		// Texture
-		std::shared_ptr<Texture> texture;
+		// Material (Shader + Texture)
+		std::shared_ptr<Material> material;
 	};
 }

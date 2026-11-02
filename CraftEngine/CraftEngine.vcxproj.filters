@@ -75,6 +75,9 @@
     <ClCompile Include="Graphics\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Win32Window.h">
@@ -152,12 +155,13 @@
     <ClInclude Include="Graphics\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSLShaders\DefaultVS.hlsl" />
     <FxCompile Include="HLSLShaders\DefaultPS.hlsl" />
-    <FxCompile Include="HLSLShaders\YellowPS.hlsl" />
-    <FxCompile Include="HLSLShaders\YellowVS.hlsl" />
     <FxCompile Include="HLSLShaders\TextureMappingPS.hlsl" />
     <FxCompile Include="HLSLShaders\TextureMappingVS.hlsl" />
   </ItemGroup>

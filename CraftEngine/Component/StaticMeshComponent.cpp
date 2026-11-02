@@ -12,7 +12,7 @@ namespace Craft
 		// 소유자 액터 가져오기
 		auto actor = GetOwner();
 
-		if (nullptr == actor || nullptr == shader || nullptr == staticMesh)
+		if (nullptr == actor || nullptr == material || nullptr == staticMesh)
 		{
 			return;
 		}
@@ -20,6 +20,6 @@ namespace Craft
 		const Transform& transform = actor->GetTransform();
 
 		// 렌더러에 제출
-		Renderer::Get().Submit(staticMesh, shader, texture, transform.GetWorldMatrix());
+		Renderer::Get().Submit(staticMesh, material, transform.GetWorldMatrix());
 	}
 }

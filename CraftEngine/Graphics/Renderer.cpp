@@ -1,7 +1,6 @@
 ﻿#include "Renderer.h"
 #include "StaticMesh.h"
-#include "Shader.h"
-#include "Texture.h"
+#include "Material.h"
 #include <Core/Win32Window.h>
 #include <cstdint>
 #include <cassert>
@@ -60,14 +59,13 @@ namespace Craft
 		EndScene(vsync);
 	}
 
-	void Renderer::Submit(const std::shared_ptr<StaticMesh>& mesh, const std::shared_ptr<Shader>& shader, const std::shared_ptr<Texture>& texture, const Matrix4& worldMatrix)
+	void Renderer::Submit(const std::shared_ptr<StaticMesh>& mesh, const std::shared_ptr<Material>& material, const Matrix4& worldMatrix)
 	{
 		// 삽입할 렌더 명령 생성
 		RenderCommand command;
 		command.worldMatrix = worldMatrix;
 		command.mesh = mesh;
-		command.shader = shader;
-		command.texture = texture;
+		command.material = material;
 
 		// 렌더 목록에 추가
 		renderCommandList.emplace_back(command);
@@ -171,7 +169,7 @@ namespace Craft
 	void Renderer::DrawCommand(const RenderCommand& command)
 	{
 		// 메시 / 셰이더 설정이 안됐으면 종료
-		if (nullptr == command.mesh || nullptr == command.shader)
+		if (nullptr == command.mesh || nullptr == command.material)
 		{
 			return;
 		}
@@ -179,14 +177,8 @@ namespace Craft
 		// 메시 바인딩
 		command.mesh->Bind();
 
-		// 셰이더 바인딩
-		command.shader->Bind();
-		
-		// 텍스처 바인딩
-		if (nullptr != command.texture)
-		{
-			command.texture->Bind(0);
-		}
+		// 머티리얼(셰이더+텍스처) 바인딩
+		command.material->Bind();
 
 		// 트랜스폼 데이터 업데이트
 		UpdateTrnasformBuffer(command.worldMatrix);
