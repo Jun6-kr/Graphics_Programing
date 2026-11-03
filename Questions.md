@@ -908,3 +908,47 @@ Renderer
 
 - Shader마다 파생 Material 클래스를 만들지, Resource와 Slot을 데이터로 등록하는 범용 Material 구조를 만들지는 후속 설계가 필요합니다.
 - Object마다 일부 Parameter만 다르게 사용할 Material Instance 구조는 아직 구현되지 않았습니다.
+
+## 2026-11-03
+
+<a id="q-034"></a>
+### Q-034. 현재 Input 구현과 Unreal Engine·XInput은 어떤 관계인가?
+
+**몰랐던 부분**
+
+- Unreal Engine 입력과 XInput이 같은 개념인지, 오늘 구현한 Keyboard Input과는 어떻게 연결되는지 정리가 필요했습니다.
+
+**알게 된 내용**
+
+- 현재 CraftEngine의 Keyboard 입력은 `WM_KEYDOWN`, `WM_KEYUP` 등 Win32 Window Message를 받아 Frame 기반 KeyState로 변환합니다.
+- XInput은 Windows에서 Xbox 호환 Game Controller의 Button·Stick·Trigger 상태를 읽고 진동을 설정하기 위한 API입니다.
+- Keyboard Message는 Event를 전달받는 방식이고, XInput Controller 상태는 일반적으로 Game Loop에서 `XInputGetState()`로 조회하는 방식입니다.
+- 두 방식은 입력을 얻는 Platform 경로는 다르지만, Engine 내부에서는 이전·현재 상태를 비교해 Down·Up·Hold와 Axis 값으로 통합할 수 있습니다.
+- Unreal Engine은 Hardware Input을 Player Input 또는 Enhanced Input의 Mapping과 Input Action으로 변환해 Gameplay 코드에 전달합니다.
+- 따라서 Unreal Engine 입력 전체가 XInput인 것은 아닙니다. XInput은 Windows Gamepad 입력에 사용할 수 있는 Platform API 중 하나이고, Unreal은 그 위에 Hardware 독립적인 입력 Mapping 계층을 제공합니다.
+
+```text
+CraftEngine Keyboard
+Win32 Message → KeyState → GetKeyDown / GetKeyUp / GetKey
+
+Gamepad 확장 예시
+XInputGetState → 이전 상태와 비교 → Button/Axis State → Gameplay
+
+Unreal Engine
+Hardware Input → Platform Layer → Mapping Context/Input Action → Gameplay
+```
+
+**관련 코드·문서**
+
+- `CraftEngine/Core/Input.h`
+- `CraftEngine/Core/Input.cpp`
+- `CraftEngine/Core/Engine.cpp`
+- `Game/Test/TestActor.cpp`
+- `DevLog/daily/2026-11-03.md`
+- [Microsoft Learn — XInput Game Controller APIs](https://learn.microsoft.com/en-us/windows/win32/xinput/)
+- [Unreal Engine — Input Overview](https://dev.epicgames.com/documentation/en-us/unreal-engine/input-overview-in-unreal-engine)
+
+**남은 질문**
+
+- CraftEngine의 Gamepad 입력을 XInput으로 구현할지 최신 GameInput API를 사용할지는 결정되지 않았습니다.
+- Hardware Key와 Button을 Gameplay Action에 매핑하는 계층은 아직 구현되지 않았습니다.
