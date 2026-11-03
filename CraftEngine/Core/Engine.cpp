@@ -1,4 +1,5 @@
 ﻿#include "Engine.h"
+#include <Core/Input.h>
 #include <Core/Win32Window.h>
 #include <Graphics/Renderer.h>
 
@@ -27,6 +28,8 @@ namespace Craft
 
         shaderManager = std::make_unique<ShaderManager>();
         textureManager = std::make_unique<TextureManager>();
+
+        input = std::make_unique<Input>();
 	}
 
     Engine::~Engine()
@@ -97,11 +100,11 @@ namespace Craft
                     remainingTime  = oneFrameTime - deltaTime;
                 }
 
-#if _DEBUG
-                std::cout << "deltTime : " << deltaTime
-                    << " | FPS : " << (1.0f / deltaTime)
-                    << "\n";
-#endif
+//#if _DEBUG
+//                std::cout << "deltTime : " << deltaTime
+//                    << " | FPS : " << (1.0f / deltaTime)
+//                    << "\n";
+//#endif
 
                 BeginPlay();
                 Tick(deltaTime);
@@ -127,6 +130,9 @@ namespace Craft
                 {
                     mainLevel->ProcessAddAndDestroyActors();
                 }
+
+                // 입력 초기화 - down/up 상태 값은 한 프레임만 유지하도록
+                input->ResetInputs();
 
                 // 이전 시간 기록
                 previous = current;
@@ -249,12 +255,71 @@ namespace Craft
         // ESC 키 입력 처리
         case WM_KEYDOWN:
         {
+            // 키눌림 이벤트 Input에 전달
+            // 포커스 확인 후 전달
+            if (GetFocus() == window && Input::IsValid())
+            {
+                // 키코드 가져오기
+                uint32_t keyCode = static_cast<uint32_t>(wparam);
+                input->OnKeyDown(keyCode);
+            }
+
             // 눌린 키가 ESC키 인지 확인
             if (wparam == VK_ESCAPE)
             {
                 DestroyWindow(window);
             }
         }
+        return 0;
+
+        case WM_KEYUP:
+        {
+            // 키눌림 해제 이벤트 Input에 전달
+            // 포커스 확인 후 전달
+            if (GetFocus() == window && Input::IsValid())
+            {
+                // 키코드 가져오기
+                uint32_t keyCode = static_cast<uint32_t>(wparam);
+                input->OnKeyUp(keyCode);
+            }
+        }
+        return 0;
+
+        case WM_SYSKEYDOWN:
+        {
+            // 키눌림 이벤트 Input에 전달
+            // 포커스 확인 후 전달
+            if (GetFocus() == window && Input::IsValid())
+            {
+                // 키코드 가져오기
+                uint32_t keyCode = static_cast<uint32_t>(wparam);
+                input->OnKeyDown(keyCode);
+            }
+        }
+        return 0;
+
+        // 창이 포커스를 잃어버렸을 때 이벤트 처리
+        case WM_KILLFOCUS:
+        {
+            if (Input::IsValid())
+            {
+                input->ResetAll();
+            }
+        }
+        return 0;
+
+        case WM_SYSKEYUP:
+        {
+            // 키눌림 해제 이벤트 Input에 전달
+            // 포커스 확인 후 전달
+            if (GetFocus() == window && Input::IsValid())
+            {
+                // 키코드 가져오기
+                uint32_t keyCode = static_cast<uint32_t>(wparam);
+                input->OnKeyUp(keyCode);
+            }
+        }
+        return 0;
 
         }
 

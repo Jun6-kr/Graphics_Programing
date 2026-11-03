@@ -79,6 +79,11 @@ public:
 		return *instance;
 	}
 
+	static bool IsValid()
+	{
+		return nullptr != instance;
+	}
+	
 private:
 	// 전역 변수
 	inline static T* instance = nullptr;
