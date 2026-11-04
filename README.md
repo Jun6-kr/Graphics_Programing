@@ -160,3 +160,4 @@ Q. 질문 원문 또는 핵심 질문
 - [2026-10-29](DevLog/daily/2026-10-29.md) — Texture Render Command 연결, UV 보간·Sampling, Shader Semantic·Rasterizer·Sampler·Material 메모
 - [2026-11-02](DevLog/daily/2026-11-02.md) — Material 추상화, Shader별 Resource 구성과 Binding 책임 분리
 - [2026-11-03](DevLog/daily/2026-11-03.md) — Win32 Keyboard Message, Frame 기반 Down·Up·Hold 입력 상태와 UE·XInput 관계
+- [2026-11-04](DevLog/daily/2026-11-04.md) — Mouse Button·Position·Delta 입력과 inline 함수의 의미·주의점

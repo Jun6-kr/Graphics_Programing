@@ -952,3 +952,45 @@ Hardware Input → Platform Layer → Mapping Context/Input Action → Gameplay
 
 - CraftEngine의 Gamepad 입력을 XInput으로 구현할지 최신 GameInput API를 사용할지는 결정되지 않았습니다.
 - Hardware Key와 Button을 Gameplay Action에 매핑하는 계층은 아직 구현되지 않았습니다.
+
+## 2026-11-04
+
+<a id="q-035"></a>
+### Q-035. Inline 함수가 많으면 어떤 문제가 생길 수 있는가?
+
+**몰랐던 부분**
+
+- `inline`은 Header에 정의부가 있어도 중복 정의 문제가 발생하지 않게 한다고 이해했지만, 많이 사용했을 때 어떤 문제가 생기는지 불명확했습니다.
+
+**알게 된 내용**
+
+- `inline` 키워드의 중요한 언어적 의미는 동일한 함수 정의가 여러 Translation Unit에 나타나는 것을 허용하는 것입니다.
+- Header에 정의한 함수는 여러 `.cpp`에서 보일 수 있으므로 `inline`을 사용하면 ODR 규칙 안에서 동일 정의를 공유할 수 있습니다.
+- 클래스 정의 내부의 Member Function은 명시적으로 적지 않아도 암시적으로 inline입니다.
+- `inline`은 Compiler가 함수 본문을 Call Site에 반드시 펼친다는 명령이 아닙니다. 실제 Inline Expansion 여부는 Compiler가 최적화 과정에서 결정합니다.
+- 따라서 `inline` 키워드가 많다는 이유만으로 실행 파일이 반드시 커지는 것은 아닙니다.
+- 실제 Expansion이 과도하면 함수 본문이 여러 곳에 복제되어 Code Size와 Instruction Cache 부담이 증가할 수 있습니다.
+- 구현이 Header에 많이 들어가면 이를 Include하는 모든 Translation Unit의 Compile 시간이 늘고, Header 변경 시 재Compile 범위가 커집니다.
+- Translation Unit마다 Macro 등으로 inline 정의가 달라지면 ODR 위반이 될 수 있습니다.
+- 최적화로 Call 경계가 사라지면 Debugging, Stack Trace와 Profiling이 어려워질 수 있습니다.
+
+```text
+inline 키워드
+→ 여러 Translation Unit의 동일 정의 허용
+
+Compiler의 Inline Expansion
+→ Call 대신 함수 본문을 펼치는 최적화
+→ 키워드와 별개의 판단
+```
+
+**관련 코드·문서**
+
+- `CraftEngine/Core/Input.h`
+- `Input::GetMousePosition()`
+- `Input::GetMouseDeltaX()`
+- `Input::GetMouseDeltaY()`
+- `DevLog/daily/2026-11-04.md`
+
+**남은 질문**
+
+- 현재처럼 짧은 Getter는 Header 내부 정의에 적합하지만, 함수가 커지거나 변경이 잦아지면 `.cpp` 분리를 검토할 필요가 있습니다.
