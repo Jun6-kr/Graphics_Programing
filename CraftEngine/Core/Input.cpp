@@ -17,6 +17,21 @@ namespace Craft
 		return IsValidKeyCode(keyCode) && keyStates[keyCode].isKey;
 	}
 
+	bool Input::GetMouseButtonDown(uint32_t button) const
+	{
+		return IsValidMouseButton(button) && mouseButtonStates[button].isButtonDown;
+	}
+
+	bool Input::GetMouseButtonUp(uint32_t button) const
+	{
+		return IsValidMouseButton(button) && mouseButtonStates[button].isButtonUp;
+	}
+
+	bool Input::GetMouseButton(uint32_t button) const
+	{
+		return IsValidMouseButton(button) && mouseButtonStates[button].isButton;
+	}
+
 	void Input::OnKeyDown(uint32_t keyCode)
 	{
 		// 키코드 값이 유효한지 확인
@@ -55,14 +70,72 @@ namespace Craft
 		state.isKey = false;
 	}
 
+	void Input::OnMouseButtonDown(uint32_t button)
+	{
+		// 코드가 유효한지 검사
+		if (!IsValidMouseButton(button))
+		{
+			return;
+		}
+
+		// 버튼 인덱스에 해당하는 상태 가져오기
+		MouseButtonState& state = mouseButtonStates[button];
+
+		// 눌림이 해제된 상태에서만 눌림 기록
+		if (!state.isButton)
+		{
+			state.isButtonDown = true;
+		}
+
+		// 눌림 상태로 기록
+		state.isButton = true;
+	}
+
+	void Input::OnMouseButtonUp(uint32_t button)
+	{
+		// 코드가 유효한지 검사
+		if (!IsValidMouseButton(button))
+		{
+			return;
+		}
+
+		// 버튼 인덱스에 해당하는 상태 가져오기
+		MouseButtonState& state = mouseButtonStates[button];
+
+		if (state.isButton)
+		{
+			state.isButtonUp = true;
+		}
+
+		state.isButton = false;
+	}
+
+	void Input::SetMousePosition(int x, int y)
+	{
+		// 전달된 값을 마우스 위치로 설정
+		mousePosition = Vector2(static_cast<float>(x), static_cast<float>(y));
+	}
+
 	void Input::ResetAll()
 	{
+		// 모든 키 입력 초기화
 		for (KeyState& state : keyStates)
 		{
 			state.isKeyDown = false;
 			state.isKeyUp = false;
 			state.isKey = false;
 		}
+
+		// 마우스 입력 상태 초기화
+		for (MouseButtonState& state : mouseButtonStates)
+		{
+			state.isButtonDown = false;
+			state.isButtonUp = false;
+			state.isButton = false;
+		}
+
+		// 마우스 위치 초기화
+		mousePreviousPosition = mousePosition;
 	}
 
 	void Input::ResetInputs()
@@ -72,10 +145,25 @@ namespace Craft
 			state.isKeyDown = false;
 			state.isKeyUp = false;
 		}
+
+		// 마우스 입력 상태 초기화
+		for (MouseButtonState& state : mouseButtonStates)
+		{
+			state.isButtonDown = false;
+			state.isButtonUp = false;
+		}
+
+		// 마우스 위치 초기화
+		mousePreviousPosition = mousePosition;
 	}
 
 	bool Input::IsValidKeyCode(uint32_t keyCode) const
 	{
 		return keyCode < keyStateCount;
+	}
+
+	bool Input::IsValidMouseButton(uint32_t button) const
+	{
+		return button < mouseButtonCount;
 	}
 }

@@ -7,6 +7,7 @@
 #include <Graphics/TextureManager.h>
 
 #include <cassert>
+#include <windowsx.h>           // 듀얼 모니터 이상, 즉 모니터의 x/y 좌표가 음수가 될 수도 있다면
 
 #if _DEBUG
 #include <iostream>
@@ -297,6 +298,98 @@ namespace Craft
             }
         }
         return 0;
+
+        // [마우스 이벤트]
+        case WM_LBUTTONDOWN:
+        {
+            // 명시적으로 입력 캡쳐 설정 - 마우스 포인터가 창을 벗어나는 경우 포커스를 잃는 상황 방지
+            SetCapture(window);
+
+            // 입력 객체에 이벤트 설정
+            if (Input::IsValid())
+            {
+                input->OnMouseButtonDown(0);
+            }
+        }
+        return 0;
+
+        case WM_LBUTTONUP:
+        {
+            // 캡처 해제 - 조건에 따라, 버튼이 풀렸을 때 캡처를 풀지 않고 유지해야 할 수도 있다. -> 이러면 이 부분 수정
+            ReleaseCapture();
+
+            // 입력 객체에 이벤트 설정
+            if (Input::IsValid())
+            {
+                input->OnMouseButtonUp(0);
+            }
+        }
+        return 0;
+        case WM_RBUTTONDOWN:
+        {
+            // 명시적으로 입력 캡쳐 설정 - 마우스 포인터가 창을 벗어나는 경우 포커스를 잃는 상황 방지
+            SetCapture(window);
+
+            // 입력 객체에 이벤트 설정
+            if (Input::IsValid())
+            {
+                input->OnMouseButtonDown(1);
+            }
+        }
+        return 0;
+
+        case WM_RBUTTONUP:
+        {
+            // 캡처 해제
+            ReleaseCapture();
+
+            // 입력 객체에 이벤트 설정
+            if (Input::IsValid())
+            {
+                input->OnMouseButtonUp(1);
+            }
+        }
+        return 0;
+        case WM_MBUTTONDOWN:
+        {
+            // 명시적으로 입력 캡쳐 설정 - 마우스 포인터가 창을 벗어나는 경우 포커스를 잃는 상황 방지
+            SetCapture(window);
+
+            // 입력 객체에 이벤트 설정
+            if (Input::IsValid())
+            {
+                input->OnMouseButtonDown(2);
+            }
+        }
+        return 0;
+
+        case WM_MBUTTONUP:
+        {
+            // 캡처 해제
+            ReleaseCapture();
+
+            // 입력 객체에 이벤트 설정
+            if (Input::IsValid())
+            {
+                input->OnMouseButtonUp(2);
+            }
+        }
+        return 0;
+
+        // 마우스 이동 이벤트
+        case WM_MOUSEMOVE:
+        {
+            if (Input::IsValid())
+            {
+                // x 좌표
+                int x = GET_X_LPARAM(lparam);
+
+                // y 좌표
+                int y = GET_Y_LPARAM(lparam);
+
+                input->SetMousePosition(x, y);
+            }
+        }
 
         // 창이 포커스를 잃어버렸을 때 이벤트 처리
         case WM_KILLFOCUS:
