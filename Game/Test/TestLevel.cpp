@@ -4,6 +4,7 @@
 #include <Actor/CameraActor.h>
 #include <Component/StaticMeshComponent.h>
 #include <Component/TransformComponent.h>
+#include <Component/CameraMovementComponent.h>
 
 #include <Graphics/Material.h>
 #include <Graphics/StaticMesh.h>
@@ -65,5 +66,6 @@ void TestLevel::Initialized()
 	centerMeshComponent->SetMaterial(textureMappingMaterial);
 
 	auto camera = SpawnActor<CameraActor>();
+	camera->AddComponent<CameraMovementComponent>();
 	camera->GetTransform().position.z = -3.0f;
 }

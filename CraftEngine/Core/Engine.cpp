@@ -390,6 +390,7 @@ namespace Craft
                 input->SetMousePosition(x, y);
             }
         }
+        return 0;
 
         // 창이 포커스를 잃어버렸을 때 이벤트 처리
         case WM_KILLFOCUS:
