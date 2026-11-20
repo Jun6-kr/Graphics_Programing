@@ -31,7 +31,7 @@ void TestLevel::Initialized()
 	auto yellowShader = ShaderManager::Get().LoadShader(L"TextureMapping");
 
 	auto defaultMaterial = std::make_shared<DefaultMaterial>();
-	auto textureMappingMaterial = std::make_shared<TextureMappingMaterial>("Assets/T_Checker.png");
+	auto textureMappingMaterial = std::make_shared<TextureMappingMaterial>("Assets/Source/Textures/T_Checker.png");
 
 	// 액터 생성
 	auto left = SpawnActor<TestActor>();
