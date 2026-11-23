@@ -161,3 +161,5 @@ Q. 질문 원문 또는 핵심 질문
 - [2026-11-02](DevLog/daily/2026-11-02.md) — Material 추상화, Shader별 Resource 구성과 Binding 책임 분리
 - [2026-11-03](DevLog/daily/2026-11-03.md) — Win32 Keyboard Message, Frame 기반 Down·Up·Hold 입력 상태와 UE·XInput 관계
 - [2026-11-04](DevLog/daily/2026-11-04.md) — Mouse Button·Position·Delta 입력과 inline 함수의 의미·주의점
+- [2026-11-20](DevLog/daily/2026-11-20.md) — Asset Importer 프로젝트, Source·Imported 경로 분리, Assimp·Batch 실행 환경 구성
+- [2026-11-23](DevLog/daily/2026-11-23.md) — Craft Texture Binary Format, stb_image RGBA 변환, Binary 직렬화와 상대 출력 경로
