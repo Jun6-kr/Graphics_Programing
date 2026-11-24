@@ -1,8 +1,15 @@
-#include "Utility.h"
+﻿#include "Utility.h"
 
 void WriteString(std::ofstream& output, const std::string& value)
 {
+	// 추가로 기록할 문자 개수
+	uint32_t size = static_cast<uint32_t>(value.size());
+	
+	// 문자 수 저장
+	WritePod(output, size);
 
+	// 문자 배열 저장
+	output.write(value.c_str(), size);
 }
 
 // 입력 경로의 형태를 유지해서 출력 경로에 폴더를 생성

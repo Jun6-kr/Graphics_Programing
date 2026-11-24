@@ -1,13 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 #include <filesystem>
-#include <CraftAssets/AssetTypes.h>
-#include <fstream>
-#include <iostream>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <ThirdParty/stb_image.h>
 
 namespace fs = std::filesystem;
 

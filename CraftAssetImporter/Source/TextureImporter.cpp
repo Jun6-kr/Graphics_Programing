@@ -1,5 +1,11 @@
-#include "TextureImporter.h"
+﻿#include "TextureImporter.h"
 #include "Utility.h"
+#include <CraftAssets/AssetTypes.h>
+#include <fstream>
+#include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <ThirdParty/stb_image.h>
 
 bool WriteTextureAsset(const uint8_t* pixels, uint32_t width, uint32_t height, const fs::path& outputPath)
 {
