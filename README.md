@@ -164,3 +164,4 @@ Q. 질문 원문 또는 핵심 질문
 - [2026-11-20](DevLog/daily/2026-11-20.md) — Asset Importer 프로젝트, Source·Imported 경로 분리, Assimp·Batch 실행 환경 구성
 - [2026-11-23](DevLog/daily/2026-11-23.md) — Craft Texture Binary Format, stb_image RGBA 변환, Binary 직렬화와 상대 출력 경로
 - [2026-11-24](DevLog/daily/2026-11-24.md) — 확장자별 Texture Import 연결, Mesh Asset 구조·Binary Writer와 Assimp Import 초기 구성
+- [2026-11-26](DevLog/daily/2026-11-26.md) — Assimp 기반 FBX 변환, 서브 메시 인덱스 범위, AssetManager 바이너리 로드와 캐시
