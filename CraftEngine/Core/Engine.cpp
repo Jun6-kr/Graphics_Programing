@@ -2,7 +2,7 @@
 #include <Core/Input.h>
 #include <Core/Win32Window.h>
 #include <Graphics/Renderer.h>
-
+#include <Graphics/AssetManager.h>
 #include <Graphics/ShaderManager.h>
 #include <Graphics/TextureManager.h>
 
@@ -27,6 +27,10 @@ namespace Craft
         // 렌더러 객체 생성
         renderer = std::make_unique<Renderer>(*window);
 
+        // 애셋 관리자 생성
+        assetManager = std::make_unique<AssetManager>();
+
+        // 셰이더 관리자 / 텍스처 관리자 객체 생성
         shaderManager = std::make_unique<ShaderManager>();
         textureManager = std::make_unique<TextureManager>();
 

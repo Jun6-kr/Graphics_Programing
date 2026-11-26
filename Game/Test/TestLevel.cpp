@@ -11,14 +11,13 @@
 #include <Graphics/ShaderManager.h>
 #include <Graphics/TextureManager.h>
 
+#include <Graphics/AssetManager.h>
+
 using namespace Craft;
 
 void TestLevel::Initialized()
 {
 	Level::Initialized();
-
-	//auto texture = Texture::Load("Assets/T_Checker.png");
-	//auto texture = TextureManager::Get().LoadTexture("Assets/T_Checker.png");
 
 	// 리소스 생성
 	auto triangle = StaticMesh::CreateTriangleMesh();
@@ -32,6 +31,9 @@ void TestLevel::Initialized()
 
 	auto defaultMaterial = std::make_shared<DefaultMaterial>();
 	auto textureMappingMaterial = std::make_shared<TextureMappingMaterial>("Assets/Source/Textures/T_Checker.png");
+
+	// 애셋 로드 테스트
+	auto meshAsset = AssetManager::Get().LoadMesh("Meshes/Sphere.cmesh");
 
 	// 액터 생성
 	auto left = SpawnActor<TestActor>();

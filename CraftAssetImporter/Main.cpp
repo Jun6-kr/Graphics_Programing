@@ -2,6 +2,7 @@
 
 #include <Source/TextureImporter.h>
 #include <Source/Utility.h>
+#include <Source/MeshImporter.h>
 
 #include <filesystem>
 #include <iostream>
@@ -17,6 +18,11 @@ bool IsTexture(const std::string& extension)
 		|| extension == ".png";
 }
 
+// FBX 모델 파일인지 확인
+bool IsMesh(const std::string& extension)
+{
+	return extension == ".fbx";
+}
 
 int main(int argc, char** argv)
 {
@@ -68,6 +74,19 @@ int main(int argc, char** argv)
 		for (char& character : extension)
 		{
 			character = std::tolower(character);
+		}
+
+		// fbx 타입이면 모델 임포트 처리
+		if (IsMesh(extension))
+		{
+			// 원본 리소스 경로
+			auto inputPath = entry.path();
+
+			// 출력 애셋 경로
+			auto outputPath = RelativeOutput(sourceRoot, outputRoot, inputPath, ".cmesh");
+
+			// 모델 임포트
+			succeeded &= ImportMesh(inputPath, outputPath, outputRoot);
 		}
 
 		// 텍스처 타입인지 확인 후 임포트 처리

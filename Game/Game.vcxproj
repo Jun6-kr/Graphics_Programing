@@ -119,7 +119,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\CraftEngine\;$(ProjectDir)\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\CraftEngine\;$(ProjectDir)\;..\Includes\;</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>GamePCH.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>GamePCH.h</ForcedIncludeFiles>
@@ -142,7 +142,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\CraftEngine\;$(ProjectDir)\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\CraftEngine\;$(ProjectDir)\;..\Includes\;</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>GamePCH.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>GamePCH.h</ForcedIncludeFiles>
