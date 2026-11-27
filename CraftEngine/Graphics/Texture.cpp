@@ -1,10 +1,8 @@
 ﻿#include "Texture.h"
 #include "Renderer.h"
+#include "AssetManager.h"
 #include <Core/Core.h>
-
-// stb_image 사용을 위한 선언
-#define STB_IMAGE_IMPLEMENTATION
-#include <ThirdParty/stb_image.h>
+#include <stdexcept>
 
 namespace Craft
 {
@@ -38,27 +36,35 @@ namespace Craft
 
 	void Texture::LoadFromFile(const std::string& path)
 	{
-		// 이미지 데이터 저장용 변수
-		int imageWidth = 0;
-		int imageHeight = 0;
-		int channelCount = 0;
+		const auto asset = AssetManager::Get().LoadTexture(path);
 
-		// 이미지 로드해서 픽셀 데이터(배열) 저장
-		stbi_uc* pixels = stbi_load(path.c_str(), &imageWidth, &imageHeight, &channelCount, STBI_rgb_alpha);
-
-		// 로드 실패 시
-		if (nullptr == pixels)
+		// 로드 실패 처리
+		if (nullptr == asset)
 		{
-			assert(false);
+			throw std::runtime_error("Failed to load texture asset: " + path);
 			return;
 		}
-		
+
+		// 무결성 검증 - 채널 수가 4개인지 확인
+		if (asset->channels != 4)
+		{
+			throw std::runtime_error("Invalid ctexture asset");
+			return;
+		}
+
+		// D3D 리고스 생성
+		LoadFromPixels(asset->pixels.data(), asset->width, asset->hegiht);
+	}
+
+	void Texture::LoadFromPixels(const uint8_t* pixels, uint32_t textureWidth, uint32_t textureHeight)
+	{
 		// 너비 / 높이 값 저장
-		width =static_cast<uint32_t>(imageWidth);
-		height = static_cast<uint32_t>(imageHeight);
+		width = textureWidth;
+		height = textureHeight;
 
 		// D3D 텍스처 리소스 생성
-		auto& device =Renderer::Get().GetDevice();
+		auto& device = Renderer::Get().GetDevice();
+
 		D3D11_TEXTURE2D_DESC textureDesc = {};
 		textureDesc.Width = width;
 		textureDesc.Height = height;
@@ -77,9 +83,6 @@ namespace Craft
 		textureData.SysMemPitch = width * 4;	// 2차원 배열의 가로 너비 -> [codex] * 4를 해주는 이유는 RGBA라서?
 
 		auto result = device.CreateTexture2D(&textureDesc, &textureData, &texture);
-		
-		// 로드한 이미지 메모리 해제 - 가져온 데이터 자체는 SubResource Data에 복사됐으니
-		stbi_image_free(pixels);
 
 		// 성공/실패 여부 확인
 		ThrowIfFailed(result, L"Failed to create texture2d");

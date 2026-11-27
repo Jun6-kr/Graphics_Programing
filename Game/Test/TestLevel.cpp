@@ -30,10 +30,11 @@ void TestLevel::Initialized()
 	auto yellowShader = ShaderManager::Get().LoadShader(L"TextureMapping");
 
 	auto defaultMaterial = std::make_shared<DefaultMaterial>();
-	auto textureMappingMaterial = std::make_shared<TextureMappingMaterial>("Assets/Source/Textures/T_Checker.png");
+	auto textureMappingMaterial = std::make_shared<TextureMappingMaterial>("Textures/T_Checker.ctexture");
 
 	// 애셋 로드 테스트
-	auto meshAsset = AssetManager::Get().LoadMesh("Meshes/Sphere.cmesh");
+	//auto meshAsset = AssetManager::Get().LoadMesh("Meshes/Sphere.cmesh");
+	const auto sphereMesh = StaticMesh::LoadFromFile("Meshes/Sphere.cmesh");
 
 	// 액터 생성
 	auto left = SpawnActor<TestActor>();
@@ -42,7 +43,7 @@ void TestLevel::Initialized()
 	left->GetTransform().position.x = -0.5f;
 
 	// 메시 설정
-	left->GetComponent<StaticMeshComponent>()->SetStaticMesh(triangle);
+	left->GetComponent<StaticMeshComponent>()->SetStaticMesh(sphereMesh);
 	//left->GetComponent<StaticMeshComponent>()->SetShader(defaultShader);
 	left->GetComponent<StaticMeshComponent>()->SetMaterial(defaultMaterial);
 

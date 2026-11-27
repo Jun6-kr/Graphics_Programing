@@ -1,8 +1,11 @@
 ﻿#include "StaticMesh.h"
 #include "Renderer.h"
 #include "Vertex.h"
+#include "AssetManager.h"
+
 #include <Core/Core.h>
 #include <cassert>
+#include <stdexcept>
 
 namespace Craft
 {
@@ -95,5 +98,50 @@ namespace Craft
 			따라서 Triangle List에서 인덱스 { 0, 1, 2 }와 { 0, 2, 3 }으로 두 삼각형을 만들고,
 			두 삼각형이 대각선 정점 0과 2를 공유해 하나의 사각형 영역을 채우도록 구성한다.
 		*/
+	}
+
+	std::shared_ptr<StaticMesh> StaticMesh::LoadFromFile(const std::string& path)
+	{
+		// 커스텀 cmesh 애셋 로드
+		const auto asset = AssetManager::Get().LoadMesh(path);
+
+		// 로드 실패 처리
+		if (nullptr == asset)
+		{
+			throw std::runtime_error("Failed to load cmesh asset: " + path);
+			return {};
+		}
+
+		// 정점/인덱스 배열이 제대로 설정됐는지 확인
+		if (asset->vertices.empty() || asset->indices.empty())
+		{
+			throw std::runtime_error("Asset has no vertices");
+			return {};
+		}
+
+		// 커스텀 애셋 데이터를 엔진의 데이터로 변환
+		// 정점 배열 선언
+		std::vector<Vertex> vertices;
+
+		// 정점 배열 크기 확보 (재할당 방지)
+		vertices.reserve(asset->vertices.size());
+
+		// 애셋에서 엔진의 정점 데이터로 변환 및 배열에 추가
+		for (const AssetVertex& sourceVertex : asset->vertices)
+		{
+			Vertex vertex = {};
+			
+			// 위치 저장
+			vertex.position = { sourceVertex.position.x, sourceVertex.position.y, sourceVertex.position.z };
+
+			// 텍스처 좌표(UV) 저장
+			vertex.uv = { sourceVertex.uv.x, sourceVertex.uv.y };
+
+			// 배열에 추가
+			vertices.emplace_back(std::move(vertex));
+		}
+
+		// 스태틱 메시 생성 후 반환
+		return std::make_shared<StaticMesh>(vertices, asset->indices);
 	}
 }

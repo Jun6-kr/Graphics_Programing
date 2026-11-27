@@ -77,16 +77,14 @@ namespace Craft
 			return {};
 		}
 
-		// 3. 정점
+		// 3. 정점 & 4. 인덱스
 		uint32_t vertexCount = 0;
+		uint32_t indexCount = 0;
 		ReadPod(input, vertexCount);
+		ReadPod(input, indexCount);
+
 		mesh->vertices.resize(vertexCount);
 		input.read(reinterpret_cast<char*>(mesh->vertices.data()), sizeof(AssetVertex) * vertexCount);
-
-
-		// 4. 인덱스
-		uint32_t indexCount = 0;
-		ReadPod(input, indexCount);
 		mesh->indices.resize(indexCount);
 		input.read(reinterpret_cast<char*>(mesh->indices.data()), sizeof(uint32_t) * indexCount);
 
